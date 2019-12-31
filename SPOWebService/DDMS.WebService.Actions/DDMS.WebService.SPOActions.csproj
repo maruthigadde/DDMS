@@ -109,9 +109,9 @@
       <Project>{5ca47e31-20de-4465-8cd9-39f085ad991b}</Project>
       <Name>SPOService.EncryptConfiguration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Common\Logger\LogManager.csproj">
+    <ProjectReference Include="..\Common\Logger\SPOService.LogManager.csproj">
       <Project>{9eab65b9-dad2-4d5a-9125-f0af64c9c822}</Project>
-      <Name>LogManager</Name>
+      <Name>SPOService.LogManager</Name>
     </ProjectReference>
     <ProjectReference Include="..\DDMS.WebService.ExternalServices\DDMS.WebService.ExternalServices.csproj">
       <Project>{eb479183-86f9-4621-8a52-d19ee4e94ee1}</Project>
