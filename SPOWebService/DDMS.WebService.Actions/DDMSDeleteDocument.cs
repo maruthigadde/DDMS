@@ -28,8 +28,6 @@ namespace DDMS.WebService.SPOActions
                     {
                         secureString = new NetworkCredential("", EncryptDecrypt.SPOPassword).SecurePassword;
                         clientContext.Credentials = new SharePointOnlineCredentials(EncryptDecrypt.SPOUserName, secureString);
-                        Folder folder = clientContext.Web.GetFolderByServerRelativeUrl("/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
-
                         if (!(string.IsNullOrEmpty(deleteDocumentRequest.Version) || string.IsNullOrWhiteSpace(deleteDocumentRequest.Version)))
                             DeleteByVersion(clientContext, deleteDocumentRequest);
                         if ((string.IsNullOrEmpty(deleteDocumentRequest.Version) || string.IsNullOrWhiteSpace(deleteDocumentRequest.Version)))

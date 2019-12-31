@@ -13,11 +13,16 @@ namespace DDMS.WebService.DDMSOperations
     {
         public override void OnAuthorization(HttpActionContext actionContext)
         {
+            //validate headers
             Dictionary<string, dynamic> headerKeyValuePairs = new Dictionary<string, dynamic>();
             if (actionContext != null && actionContext.Request != null && actionContext.Request.Headers != null)
             {
                 if (!ValidateHeader(actionContext, ref headerKeyValuePairs))
                 {
+                    headerKeyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
+                    headerKeyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
+                    headerKeyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
+                    headerKeyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                     HandleUnathorized(actionContext);
                     foreach (var field in headerKeyValuePairs)
                     {
@@ -56,42 +61,37 @@ namespace DDMS.WebService.DDMSOperations
             DateTime collectedTimeStamp = new DateTime();
             try
             {
+                //If MessageId is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.MessageId) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.MessageId).First()))
                 {
-                    keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                    keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                    keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionMessageIdRequired);
-                    keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                     return false;
                 }
+                //If SiteId is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.SiteId) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.SiteId).First()))
                 {
-                    keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                    keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                    keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionSiteIdRequired);
-                    keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                     return false;
                 }
+                //If BusinessId is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.BusinessId) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.BusinessId).First()))
                 {
-                    keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                    keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                    keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionBusinessIdRequired);
-                    keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                     return false;
                 }
+                // If CollectedTimeStamp is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.CollectedTimeStamp) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.CollectedTimeStamp).First()))
                 {
-                    keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                    keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                    keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionCollectedTimeStampRequired);
-                    keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                     return false;
                 }
+
+                /*check header values as per Honda Requirements
+                MessageId = GUID format
+                SiteId= DDMS
+                BusinessId = DDMS Documents
+                TimeStamp = Datetime
+                */
                 if (actionContext.Request.Headers.Contains(HeaderConstants.MessageId) && actionContext.Request.Headers.Contains(HeaderConstants.SiteId) && actionContext.Request.Headers.Contains(HeaderConstants.BusinessId) && actionContext.Request.Headers.Contains(HeaderConstants.CollectedTimeStamp))
                 {
                     if (actionContext.Request.Headers.Contains(HeaderConstants.MessageId) && !string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.MessageId).First()))
@@ -99,11 +99,7 @@ namespace DDMS.WebService.DDMSOperations
                         bool result = Guid.TryParse(actionContext.Request.Headers.GetValues(HeaderConstants.MessageId).First(), out messageId);
                         if (!result && messageId == Guid.Empty)
                         {
-                            keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                            keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                            keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                             keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionMessageIdInvalid);
-                            keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                             return false;
                         }
                     }
@@ -112,11 +108,7 @@ namespace DDMS.WebService.DDMSOperations
                     {
                         if (actionContext.Request.Headers.GetValues(HeaderConstants.SiteId).First().ToUpper() != HeaderValueConstants.SiteId.ToUpper())
                         {
-                            keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                            keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                            keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                             keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionSiteIdInvalid);
-                            keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                             return false;
                         }
                     }
@@ -125,11 +117,7 @@ namespace DDMS.WebService.DDMSOperations
                     {
                         if (actionContext.Request.Headers.GetValues(HeaderConstants.BusinessId).First().ToUpper() != HeaderValueConstants.BusinessId.ToUpper())
                         {
-                            keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                            keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                            keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                             keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionBusinessIdInvalid);
-                            keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                             return false;
                         }
                     }
@@ -139,11 +127,7 @@ namespace DDMS.WebService.DDMSOperations
                         bool result = DateTime.TryParse(actionContext.Request.Headers.GetValues(HeaderConstants.CollectedTimeStamp).First(), out collectedTimeStamp);
                         if (!result)
                         {
-                            keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                            keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
-                            keyValuePairs.Add(HeaderConstants.Node, actionContext.Request.GetRequestContext().VirtualPathRoot);
                             keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionCollectedTimeStampInvalid);
-                            keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.Unauthorized);
                             return false;
                         }
                     }

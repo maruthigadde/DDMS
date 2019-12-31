@@ -13,16 +13,16 @@ using SPOService.LogManager;
 
 namespace DDMS.WebService.DDMSOperations.Controllers
 {
-    //[Authorize(Roles="DDMS")]
+    [Authorize(Roles = "DDMS")]
     [HeaderValidate]
-    public class DDMSOperationsController : ApiController
+    public class DDMSController : ApiController
     {
         private IDDMSSearchDocument ddmsSearchDocument;
         private IDDMSDeleteDocument ddmsDeleteDocument;
         private IDDMSUploadDocument ddmsUploadDocument;
-        private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(DDMSOperationsController));
+        private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(DDMSController));
 
-        public DDMSOperationsController(IDDMSSearchDocument dDMSSearchDocument, IDDMSDeleteDocument dDMSDeleteDocument, IDDMSUploadDocument dDMSUploadDocument)
+        public DDMSController(IDDMSSearchDocument dDMSSearchDocument, IDDMSDeleteDocument dDMSDeleteDocument, IDDMSUploadDocument dDMSUploadDocument)
         {
             ddmsSearchDocument = dDMSSearchDocument;
             ddmsDeleteDocument = dDMSDeleteDocument;
@@ -32,19 +32,13 @@ namespace DDMS.WebService.DDMSOperations.Controllers
         [HttpGet, Route("~/api/DDMS/{DocumentId:Guid}/"), Route("~/api/DDMS/{DocumentId:Guid}/{Version:decimal}")]
         public IHttpActionResult SearchDocument(Guid documentId, string version = null)
         {
-            Guid messageId = Guid.Empty;
-            Dictionary<string, dynamic> keyValuePairs = new Dictionary<string, dynamic>();
+            Guid messageId;
+            Dictionary<string, dynamic> keyValuePairs;
+            RetrieveHeaders(out keyValuePairs, out messageId);
             SearchDocumentRequest searchDocumentRequest = new SearchDocumentRequest();
             SearchDocumentResponse searchDocumentResponse = new SearchDocumentResponse();
             try
             {
-                messageId = Guid.Parse(Request.Headers.GetValues(HeaderConstants.MessageId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                keyValuePairs.Add(HeaderConstants.MessageId, messageId.ToString());
-                keyValuePairs.Add(HeaderConstants.SiteId, Request.Headers.GetValues(HeaderConstants.SiteId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.BusinessId, Request.Headers.GetValues(HeaderConstants.BusinessId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.Node, Request.GetRequestContext().VirtualPathRoot);
-
                 Logger.LogSetup(messageId.ToString());
                 Log.Info("In api/SearchDocument method");
                 searchDocumentRequest.DocumentId = documentId;
@@ -60,7 +54,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                             Log.Info("In api/SearchDocument, before calling DDMSSearchAllOldVersions method- Document ID :" + searchDocumentRequest.DocumentId.ToString());
                             searchDocumentAllVersionsResponse = ddmsSearchDocument.DDMSSearchAllOldVersions(searchDocumentRequest);
                             Log.Info("In api/SearchDocument, after calling DDMSSearchAllOldVersions method");
-                            keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                             keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.OK);
                             keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Success);
                             foreach (var field in keyValuePairs)
@@ -75,7 +68,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                             Log.ErrorFormat("Error in api/SearchDocument :{0}", e.Message);
                             if (e.Message == ErrorMessage.FileNotFound)
                             {
-                                keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                                 keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.NotFound);
                                 keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                                 keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -89,7 +81,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                             }
                             else
                             {
-                                keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                                 keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                                 keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                                 keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -109,11 +100,10 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                         Log.DebugFormat("In api/SearchDocument, before calling DDMSSearch method- Document ID :{0} Version :{1}", searchDocumentRequest.DocumentId.ToString(), searchDocumentRequest.Version);
                         searchDocumentResponse = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
                         Log.Info("In api/SearchDocument, after calling DDMSSearch method");
-                        
+
                         if (string.IsNullOrEmpty(searchDocumentResponse.ErrorMessage))
                         {
 
-                            keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                             keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.OK);
                             keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Success);
                             foreach (var field in keyValuePairs)
@@ -126,7 +116,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
 
                         if (searchDocumentResponse.ErrorMessage == ErrorMessage.FileNotFound)
                         {
-                            keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                             keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.NotFound);
                             keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                             keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -140,7 +129,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                         }
                         else
                         {
-                            keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                             keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                             keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                             keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -157,8 +145,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                     {
                         Log.ErrorFormat("Error in api/SearchDocument DDMSSearch method :{0}", ex.Message);
                         searchDocumentResponse.ErrorMessage = ex.Message;
-                        
-                        keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                         keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                         keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                         keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -174,7 +160,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                 else
                 {
                     Log.Info("In api/SearchDocument, DocumentId is empty - Document ID :" + searchDocumentRequest.DocumentId.ToString());
-                    keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                     keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -191,7 +176,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
             {
                 Log.ErrorFormat("Error in api/SearchDocument :{0}", ex.Message);
 
-                keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
+
                 keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                 keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                 keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -205,29 +190,24 @@ namespace DDMS.WebService.DDMSOperations.Controllers
             }
         }
 
+
+
         [HttpPost, Route("~/api/DDMS/"), ModelStateValidation]
         public IHttpActionResult UploadDocument([FromBody]UploadDocumentRequest uploadDocumentRequest)
         {
-            Guid messageId = Guid.Empty;
-            Dictionary<string, dynamic> keyValuePairs = new Dictionary<string, dynamic>();
+            Guid messageId;
+            Dictionary<string, dynamic> keyValuePairs;
+            RetrieveHeaders(out keyValuePairs, out messageId);
             UploadDocumentResponse uploadDocumentResponse = new UploadDocumentResponse();
             try
             {
-                messageId = Guid.Parse(Request.Headers.GetValues(HeaderConstants.MessageId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                keyValuePairs.Add(HeaderConstants.MessageId, messageId.ToString());
-                keyValuePairs.Add(HeaderConstants.SiteId, Request.Headers.GetValues(HeaderConstants.SiteId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.BusinessId, Request.Headers.GetValues(HeaderConstants.BusinessId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.Node, Request.GetRequestContext().VirtualPathRoot);
-
                 Logger.LogSetup(messageId.ToString());
                 Log.Info("In api/UploadDocument method");
 
                 uploadDocumentResponse = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
-                
+
                 if (string.IsNullOrEmpty(uploadDocumentResponse.ErrorMessage))
                 {
-                    keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.OK);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Success);
                     foreach (var field in keyValuePairs)
@@ -240,7 +220,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
 
                 if (uploadDocumentResponse.ErrorMessage == ErrorMessage.FileNotFound)
                 {
-                    keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.NotFound);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                     keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -254,7 +233,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                 }
                 else
                 {
-                    keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                     keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -271,8 +249,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
             {
                 Log.ErrorFormat("Error in api/UploadDocument DDMSUpload method :{0}", ex.Message);
                 uploadDocumentResponse.ErrorMessage = ex.Message;
-                
-                keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
+
                 keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                 keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                 keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -289,19 +266,13 @@ namespace DDMS.WebService.DDMSOperations.Controllers
         [HttpDelete, Route("~/api/DDMS/{DocumentId:Guid}/"), Route("~/api/DDMS/{DocumentId:Guid}/{Version:decimal}")]
         public IHttpActionResult DeleteDocument(Guid documentId, string version = null)
         {
-            Guid messageId = Guid.Empty;
-            Dictionary<string, dynamic> keyValuePairs = new Dictionary<string, dynamic>();
+            Guid messageId;
+            Dictionary<string, dynamic> keyValuePairs;
+            RetrieveHeaders(out keyValuePairs, out messageId);
             DeleteDocumentRequest deleteDocumentRequest = new DeleteDocumentRequest();
             DeleteDocumentResponse deleteDocumentResponse = new DeleteDocumentResponse();
             try
             {
-                messageId = Guid.Parse(Request.Headers.GetValues(HeaderConstants.MessageId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
-                keyValuePairs.Add(HeaderConstants.MessageId, messageId.ToString());
-                keyValuePairs.Add(HeaderConstants.SiteId, Request.Headers.GetValues(HeaderConstants.SiteId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.BusinessId, Request.Headers.GetValues(HeaderConstants.BusinessId).First().ToString());
-                keyValuePairs.Add(HeaderConstants.Node, Request.GetRequestContext().VirtualPathRoot);
-
                 Logger.LogSetup(messageId.ToString());
                 Log.Info("In api/DeleteDocument method");
 
@@ -310,10 +281,9 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                 Log.Info("In api/DeleteDocument before calling DDMSDelete");
                 deleteDocumentResponse = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
                 Log.Info("In api/DeleteDocument after calling DDMSDelete");
-                
+
                 if (string.IsNullOrEmpty(deleteDocumentResponse.ErrorMessage))
                 {
-                    keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.OK);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Success);
                     foreach (var field in keyValuePairs)
@@ -326,7 +296,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
 
                 if (deleteDocumentResponse.ErrorMessage == ErrorMessage.FileNotFound)
                 {
-                    keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.NotFound);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                     keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -340,7 +309,6 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                 }
                 else
                 {
-                    keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                     keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -357,8 +325,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
             {
                 Log.ErrorFormat("Error in api/DeleteDocument DDMSDelete method :{0}", ex.Message);
                 deleteDocumentResponse.ErrorMessage = ex.Message;
-                
-                keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
+
                 keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.InternalServerError);
                 keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Failed);
                 keyValuePairs.Add(HeaderConstants.ErrorType, HeaderErrorConstants.ErrorTypeSecurity);
@@ -370,6 +337,17 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                 }
                 return Content(HttpStatusCode.InternalServerError, deleteDocumentResponse);
             }
+        }
+        private void RetrieveHeaders(out Dictionary<string, dynamic> keyValuePairs, out Guid messageId)
+        {
+            messageId = Guid.Parse(Request.Headers.GetValues(HeaderConstants.MessageId).First().ToString());
+            keyValuePairs = new Dictionary<string, dynamic>();
+            keyValuePairs.Add(HeaderConstants.Code, HeaderErrorConstants.CodeSender);
+            keyValuePairs.Add(HeaderConstants.MessageId, messageId.ToString());
+            keyValuePairs.Add(HeaderConstants.SiteId, Request.Headers.GetValues(HeaderConstants.SiteId).First().ToString());
+            keyValuePairs.Add(HeaderConstants.BusinessId, Request.Headers.GetValues(HeaderConstants.BusinessId).First().ToString());
+            keyValuePairs.Add(HeaderConstants.Node, Request.GetRequestContext().VirtualPathRoot);
+            keyValuePairs.Add(HeaderConstants.CollectedTimeStamp, DateTime.Now.ToString());
         }
     }
 }

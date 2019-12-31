@@ -42,35 +42,6 @@ namespace SPOService.EncryptConfiguration
             {
                 throw ex;
             }
-        }
-
-        public static string Encrypt(string PlainText, ref string Key, ref string Iv)
-        {
-            AesManaged aesManaged = new AesManaged();
-            try
-            {
-                byte[] bytestoEncrypt = Encoding.ASCII.GetBytes(PlainText);
-                aesManaged.KeySize = KeyBitSize;
-                aesManaged.Mode = CipherMode.ECB;
-                aesManaged.Padding = PaddingMode.PKCS7;
-
-                aesManaged.GenerateIV();
-                aesManaged.GenerateKey();
-
-                Iv = Convert.ToBase64String(aesManaged.IV);
-                Key = Convert.ToBase64String(aesManaged.Key);
-
-                ICryptoTransform cryptoTransform = aesManaged.CreateEncryptor(aesManaged.Key, aesManaged.IV);
-                byte[] resultArray =
-      cryptoTransform.TransformFinalBlock(bytestoEncrypt, 0,
-      bytestoEncrypt.Length);
-
-                return Convert.ToBase64String(resultArray);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+        }        
     }
 }
