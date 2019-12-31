@@ -9,7 +9,7 @@ using DDMS.WebService.Models.Common;
 using DDMS.WebService.ExternalServices.Interfaces;
 using System.Web;
 using log4net;
-using LogManager;
+using SPOService.LogManager;
 
 namespace DDMS.WebService.DDMSOperations.Controllers
 {
