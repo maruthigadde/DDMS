@@ -13,7 +13,7 @@ namespace DDMS.WebService.SPOActions
 {
     public class DDMSDeleteDocument : IDDMSDeleteDocument
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(DDMSDeleteDocument));
+        private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(DDMSDeleteDocument));
         #region Public Member Functions
         public DeleteDocumentResponse DDMSDelete(DeleteDocumentRequest deleteDocumentRequest)
         {

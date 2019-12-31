@@ -8,7 +8,7 @@ namespace DDMS.WebService.SPOActions
 {
     public static class RetryExecution
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RetryExecution));
+        private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(RetryExecution));
         public static void ExecuteQueryWithRetry(this ClientContext clientContext, int retryCount, int delayTime)
         {
             Log.Info("In ExecuteQueryWithRetry method");

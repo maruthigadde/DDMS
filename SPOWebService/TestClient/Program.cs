@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using DDMS.WebService.Models.Honda;
+using DDMS.WebService;
 using DDMS.WebService.SPOActions;
 using System.Security.Cryptography;
 using System.Configuration;
@@ -15,7 +15,7 @@ using log4net.Appender;
 using log4net.Core;
 using System.Net;
 using Newtonsoft.Json;
-using EncryptConfiguration;
+
 
 namespace TestClient
 {

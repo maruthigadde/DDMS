@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D50B82E7-A700-4C37-900C-7D9307E3F1A6}</ProjectGuid>
+    <ProjectGuid>{5CA47E31-20DE-4465-8CD9-39F085AD991B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EncryptDecrypt</RootNamespace>
@@ -44,6 +44,12 @@
   <ItemGroup>
     <Compile Include="EncryptDecrypt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DDMS.WebService.Models\DDMS.WebService.Models.csproj">
+      <Project>{66307a85-dda0-4e7f-a0ba-a873c4207d11}</Project>
+      <Name>DDMS.WebService.Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

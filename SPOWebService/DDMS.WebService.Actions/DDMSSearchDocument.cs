@@ -10,12 +10,13 @@ using System.Security;
 using System.Net;
 using log4net;
 using EncryptConfiguration;
+using LogManager;
 
 namespace DDMS.WebService.SPOActions
 {
     public class DDMSSearchDocument : IDDMSSearchDocument
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(DDMSSearchDocument));
+        private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(DDMSSearchDocument));
         #region Public Member Functions
         public SearchDocumentResponse DDMSSearch(SearchDocumentRequest searchDocumentRequest)
         {

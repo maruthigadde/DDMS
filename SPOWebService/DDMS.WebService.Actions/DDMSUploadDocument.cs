@@ -13,7 +13,7 @@ namespace DDMS.WebService.SPOActions
 {
     public class DDMSUploadDocument : IDDMSUploadDocument
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(DDMSUploadDocument));
+        private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(DDMSUploadDocument));
         #region Public Member Functions 
         public UploadDocumentResponse DDMSUpload(UploadDocumentRequest uploadDocumentRequest)
         {

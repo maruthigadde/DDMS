@@ -101,17 +101,21 @@
     <Compile Include="RetryExecution.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DDMS.WebService.ExternalServices\DDMS.WebService.ExternalServices.csproj">
-      <Project>{eb479183-86f9-4621-8a52-d19ee4e94ee1}</Project>
-      <Name>DDMS.WebService.ExternalServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DDMS.WebService.Models\DDMS.WebService.Models.csproj">
+    <ProjectReference Include="..\Common\DDMS.WebService.Models\DDMS.WebService.Models.csproj">
       <Project>{66307a85-dda0-4e7f-a0ba-a873c4207d11}</Project>
       <Name>DDMS.WebService.Models</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EncryptDecrypt\EncryptConfiguration.csproj">
-      <Project>{d50b82e7-a700-4c37-900c-7d9307e3f1a6}</Project>
+    <ProjectReference Include="..\Common\EncryptDecrypt\EncryptConfiguration.csproj">
+      <Project>{5ca47e31-20de-4465-8cd9-39f085ad991b}</Project>
       <Name>EncryptConfiguration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Logger\LogManager.csproj">
+      <Project>{9eab65b9-dad2-4d5a-9125-f0af64c9c822}</Project>
+      <Name>LogManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DDMS.WebService.ExternalServices\DDMS.WebService.ExternalServices.csproj">
+      <Project>{eb479183-86f9-4621-8a52-d19ee4e94ee1}</Project>
+      <Name>DDMS.WebService.ExternalServices</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
