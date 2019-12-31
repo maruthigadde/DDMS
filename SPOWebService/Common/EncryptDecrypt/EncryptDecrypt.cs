@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EncryptConfiguration
+namespace SPOService.EncryptConfiguration
 {
     public class EncryptDecrypt
     {

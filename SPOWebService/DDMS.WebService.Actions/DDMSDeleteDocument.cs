@@ -7,7 +7,7 @@ using System.Configuration;
 using System.Security;
 using System.Net;
 using log4net;
-using EncryptConfiguration;
+using SPOService.EncryptConfiguration;
 
 namespace DDMS.WebService.SPOActions
 {

@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LogManager
+namespace SPOService.LogManager
 {
     public class Logger
     {

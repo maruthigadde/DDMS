@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.Models", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogManager", "Common\Logger\LogManager.csproj", "{9EAB65B9-DAD2-4D5A-9125-F0AF64C9C822}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EncryptConfiguration", "Common\EncryptDecrypt\EncryptConfiguration.csproj", "{5CA47E31-20DE-4465-8CD9-39F085AD991B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPOService.EncryptConfiguration", "Common\EncryptDecrypt\SPOService.EncryptConfiguration.csproj", "{5CA47E31-20DE-4465-8CD9-39F085AD991B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
