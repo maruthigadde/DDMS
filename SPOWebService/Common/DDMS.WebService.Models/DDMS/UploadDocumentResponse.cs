@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
 
-namespace DDMS.WebService.Models.Honda
+namespace DDMS.WebService.Models
 {
-    public class SearchDocumentRequest
+    public class UploadDocumentResponse
     {
         #region Private Fields
         private Guid _documentid;
         private string _version;
+        //private string _correlationid;
+        private string _errormessage;
         #endregion
 
         #region Public Fields
-        [Required(AllowEmptyStrings = false, ErrorMessage = "DocumentId is mandatory")]
         public Guid DocumentId
         {
             get
@@ -28,7 +27,6 @@ namespace DDMS.WebService.Models.Honda
                 this._documentid = value;
             }
         }
-
         public string Version
         {
             get
@@ -38,6 +36,28 @@ namespace DDMS.WebService.Models.Honda
             set
             {
                 this._version = value;
+            }
+        }
+        //public string CorrelationId
+        //{
+        //    get
+        //    {
+        //        return this._correlationid;
+        //    }
+        //    set
+        //    {
+        //        this._correlationid = value;
+        //    }
+        //}
+        public string ErrorMessage
+        {
+            get
+            {
+                return this._errormessage;
+            }
+            set
+            {
+                this._errormessage = value;
             }
         }
         #endregion

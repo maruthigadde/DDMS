@@ -4,20 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DDMS.WebService.Models.Honda
+namespace DDMS.WebService.Models
 {
-    public class SearchDocumentResponse
+    public class SearchDocumentAllVersionsResponse
     {
         #region Private Fields
         private string _documentname;
         private string _version;
-        private byte[] _documentcontent;
         private string _dealernumber;
         private string _requestuser;
         private string _documentumid;
         private string _documentumversion;
         //private string _correlationid;
-        private string _errormessage;
         #endregion
 
         #region Public Fields
@@ -41,17 +39,6 @@ namespace DDMS.WebService.Models.Honda
             set
             {
                 this._version = value;
-            }
-        }
-        public byte[] DocumentContent
-        {
-            get
-            {
-                return this._documentcontent;
-            }
-            set
-            {
-                this._documentcontent = value;
             }
         }
         public string DealerNumber
@@ -109,17 +96,6 @@ namespace DDMS.WebService.Models.Honda
         //        this._correlationid = value;
         //    }
         //}
-        public string ErrorMessage
-        {
-            get
-            {
-                return this._errormessage;
-            }
-            set
-            {
-                this._errormessage = value;
-            }
-        }
         #endregion
     }
 }

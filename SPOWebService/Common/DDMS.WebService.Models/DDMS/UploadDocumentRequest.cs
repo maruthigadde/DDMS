@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
-namespace DDMS.WebService.Models.Honda
+namespace DDMS.WebService.Models
 {
     public class UploadDocumentRequest
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DDMS.WebService.Models.Honda
+namespace DDMS.WebService.Models
 {
     public class DeleteDocumentResponse
     {

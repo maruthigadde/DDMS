@@ -44,13 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Constants.cs" />
-    <Compile Include="Honda\DeleteDocumentRequest.cs" />
-    <Compile Include="Honda\DeleteDocumentResponse.cs" />
-    <Compile Include="Honda\SearchDocumentAllVersionsResponse.cs" />
-    <Compile Include="Honda\SearchDocumentRequest.cs" />
-    <Compile Include="Honda\SearchDocumentResponse.cs" />
-    <Compile Include="Honda\UploadDocumentRequest.cs" />
-    <Compile Include="Honda\UploadDocumentResponse.cs" />
+    <Compile Include="DDMS\DeleteDocumentRequest.cs" />
+    <Compile Include="DDMS\DeleteDocumentResponse.cs" />
+    <Compile Include="DDMS\SearchDocumentAllVersionsResponse.cs" />
+    <Compile Include="DDMS\SearchDocumentRequest.cs" />
+    <Compile Include="DDMS\SearchDocumentResponse.cs" />
+    <Compile Include="DDMS\UploadDocumentRequest.cs" />
+    <Compile Include="DDMS\UploadDocumentResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DDMS.WebService.Models.Honda;
+using DDMS.WebService.Models;
 
 namespace DDMS.WebService.ExternalServices.Interfaces
 {
