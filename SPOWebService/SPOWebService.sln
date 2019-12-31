@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPOService.LogManager", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPOService.EncryptConfiguration", "Common\EncryptDecrypt\SPOService.EncryptConfiguration.csproj", "{5CA47E31-20DE-4465-8CD9-39F085AD991B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{6D580D13-466D-48AB-9739-FFB860A14108}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPOWebServiceTest", "DDMSWebServiceTest\SPOWebServiceTest.csproj", "{D37FE0C7-9170-4B90-89C1-4415CD1D97F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +53,10 @@ Global
 		{5CA47E31-20DE-4465-8CD9-39F085AD991B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CA47E31-20DE-4465-8CD9-39F085AD991B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CA47E31-20DE-4465-8CD9-39F085AD991B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D37FE0C7-9170-4B90-89C1-4415CD1D97F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D37FE0C7-9170-4B90-89C1-4415CD1D97F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D37FE0C7-9170-4B90-89C1-4415CD1D97F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D37FE0C7-9170-4B90-89C1-4415CD1D97F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +68,7 @@ Global
 		{66307A85-DDA0-4E7F-A0BA-A873C4207D11} = {851233AB-DD6D-443F-8D78-7CA1C442781E}
 		{9EAB65B9-DAD2-4D5A-9125-F0AF64C9C822} = {851233AB-DD6D-443F-8D78-7CA1C442781E}
 		{5CA47E31-20DE-4465-8CD9-39F085AD991B} = {851233AB-DD6D-443F-8D78-7CA1C442781E}
+		{D37FE0C7-9170-4B90-89C1-4415CD1D97F3} = {6D580D13-466D-48AB-9739-FFB860A14108}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5FEF3E0E-1FA8-45DC-8131-1D87ED568926}
