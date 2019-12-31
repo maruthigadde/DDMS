@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.ExternalSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.SPOActions", "DDMS.WebService.Actions\DDMS.WebService.SPOActions.csproj", "{228F9C4D-5C32-47A6-A29D-2BA6FCB1E755}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.DDMSOperations", "DDMS.WebService.DDMSOperations\DDMS.WebService.DDMSOperations.csproj", "{0E9165BB-94AB-4F2B-867D-D64983675A1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService", "DDMS.WebService.DDMSOperations\DDMS.WebService.csproj", "{0E9165BB-94AB-4F2B-867D-D64983675A1C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.Models", "Common\DDMS.WebService.Models\DDMS.WebService.Models.csproj", "{66307A85-DDA0-4E7F-A0BA-A873C4207D11}"
 EndProject
