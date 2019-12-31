@@ -113,9 +113,9 @@
       <Project>{9eab65b9-dad2-4d5a-9125-f0af64c9c822}</Project>
       <Name>SPOService.LogManager</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DDMS.WebService.ExternalServices\DDMS.WebService.ExternalServices.csproj">
+    <ProjectReference Include="..\DDMS.WebService.ExternalServices\DDMS.WebService.Interfaces.csproj">
       <Project>{eb479183-86f9-4621-8a52-d19ee4e94ee1}</Project>
-      <Name>DDMS.WebService.ExternalServices</Name>
+      <Name>DDMS.WebService.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

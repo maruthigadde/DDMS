@@ -307,9 +307,9 @@
       <Project>{228f9c4d-5c32-47a6-a29d-2ba6fcb1e755}</Project>
       <Name>DDMS.WebService.SPOActions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DDMS.WebService.ExternalServices\DDMS.WebService.ExternalServices.csproj">
+    <ProjectReference Include="..\DDMS.WebService.ExternalServices\DDMS.WebService.Interfaces.csproj">
       <Project>{eb479183-86f9-4621-8a52-d19ee4e94ee1}</Project>
-      <Name>DDMS.WebService.ExternalServices</Name>
+      <Name>DDMS.WebService.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

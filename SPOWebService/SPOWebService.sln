@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{851233
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DDMS.WebService", "DDMS.WebService", "{02B46DD6-BDED-447A-9E9A-1478266273E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.ExternalServices", "DDMS.WebService.ExternalServices\DDMS.WebService.ExternalServices.csproj", "{EB479183-86F9-4621-8A52-D19EE4E94EE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.Interfaces", "DDMS.WebService.ExternalServices\DDMS.WebService.Interfaces.csproj", "{EB479183-86F9-4621-8A52-D19EE4E94EE1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.SPOActions", "DDMS.WebService.Actions\DDMS.WebService.SPOActions.csproj", "{228F9C4D-5C32-47A6-A29D-2BA6FCB1E755}"
 EndProject
