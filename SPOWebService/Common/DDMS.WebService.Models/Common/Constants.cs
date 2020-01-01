@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace DDMS.WebService.Models.Common
 {
-
+    [ExcludeFromCodeCoverage]
     public static class ConfigurationConstants
     {
         //public const string SPOSiteId = "SPOSiteId";
@@ -22,6 +18,8 @@ namespace DDMS.WebService.Models.Common
         public const string SPOSiteURL = "SPOSiteURL";
         public const string SPOFolder = "SPOFolder";
     }
+
+    [ExcludeFromCodeCoverage]
     public static class LoggerConfigurationConstants
     {
         public const string LogDirectory = "LogDirectory";
@@ -35,6 +33,8 @@ namespace DDMS.WebService.Models.Common
         public const string DateTimeFormat = "dd-MM-yyyy";
         public const string FileExtension = ".txt";
     }
+
+    [ExcludeFromCodeCoverage]
     public static class SpoConstants
     {
         public const string Title = "Title";
@@ -54,7 +54,7 @@ namespace DDMS.WebService.Models.Common
         public const int MaxFileSize = 31457280;
         public const string DocumentId = "documentId";
     }
-
+    [ExcludeFromCodeCoverage]
     public static class HeaderConstants
     {
         public const string Code = "Code";
@@ -69,6 +69,7 @@ namespace DDMS.WebService.Models.Common
         public const string ErrorDescription = "ErrorDescription";
     }
 
+    [ExcludeFromCodeCoverage]
     public static class HeaderValueConstants
     {
         public const string SiteId = "DDMS";
@@ -77,6 +78,7 @@ namespace DDMS.WebService.Models.Common
         public const string Failed = "Failed";
     }
 
+    [ExcludeFromCodeCoverage]
     public static class HeaderErrorConstants
     {
         public const string CodeSender = "Sender";
@@ -91,13 +93,14 @@ namespace DDMS.WebService.Models.Common
         public const string ErrorDescriptionBusinessIdInvalid = "Invalid request businessId invalid";
         public const string ErrorDescriptionSiteIdInvalid = "Invalid request siteId invalid";
     }
-
+    [ExcludeFromCodeCoverage]
     public static class ExecuteQueryConstants
     {
         public const int RetryCount = 3;
         public const int RetryDelayTime = 30000;
     }
 
+    [ExcludeFromCodeCoverage]
     public static class LogLevel
     {
         public const string Info = "INFO";
@@ -105,6 +108,7 @@ namespace DDMS.WebService.Models.Common
         public const string Error = "ERROR";
     }
 
+    [ExcludeFromCodeCoverage]
     public static class ErrorMessage
     {
         public const string DifferentFileExtension = "Cannot update a file with different extension,please upload the file with same extension";
@@ -121,6 +125,7 @@ namespace DDMS.WebService.Models.Common
         public const string MaxFileSizeContentReached = "Unable to upload,file size should not be more than 30MB";
     }
 
+    [ExcludeFromCodeCoverage]
     public static class ErrorException
     {
         public const string SystemIoFileNotFound = "System.IO.FileNotFoundException";
@@ -128,6 +133,7 @@ namespace DDMS.WebService.Models.Common
         public const string SpFieldValueException = "Microsoft.SharePoint.SPFieldValueException";
     }
 
+    [ExcludeFromCodeCoverage]
     public static class Constants
     {
         public const string ContentType = "application/json;odata=nometadata";

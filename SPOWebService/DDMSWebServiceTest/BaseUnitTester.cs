@@ -1,8 +1,7 @@
-﻿using AutoFixture;
-using Ploeh.AutoFixture;
+﻿using Ploeh.AutoFixture;
 using System;
 
-namespace SPOServiceUnitTests
+namespace DDMSWebServiceTest
 {
     public abstract class BaseUnitTester
     {

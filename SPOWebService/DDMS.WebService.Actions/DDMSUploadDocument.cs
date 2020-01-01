@@ -48,8 +48,16 @@ namespace DDMS.WebService.SPOActions
                 {
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
-                        secureString = new NetworkCredential("", EncryptDecrypt.SPOPassword).SecurePassword;
-                        clientContext.Credentials = new SharePointOnlineCredentials(EncryptDecrypt.SPOUserName, secureString);
+                        secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
+
+                        String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv));
+
+                        clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
+
                         if (TryGetFileByServerRelativeUrl(clientContext, uploadDocumentRequest))
                         {
                             Random random = new Random();
@@ -122,8 +130,15 @@ namespace DDMS.WebService.SPOActions
                 Log.Info("In UpdateDocument method");
                 using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                 {
-                    secureString = new NetworkCredential("", EncryptDecrypt.SPOPassword).SecurePassword;
-                    clientContext.Credentials = new SharePointOnlineCredentials(EncryptDecrypt.SPOUserName, secureString);
+                    secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
+
+                   String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
+
+                    clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
                     Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
 
                     File file = clientContext.Web.GetFileById(uploadDocumentRequest.DocumentId);

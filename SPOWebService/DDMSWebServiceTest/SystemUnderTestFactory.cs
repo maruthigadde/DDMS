@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using AutoFixture;
-using AutoFixture.Kernel;
 using NSubstitute;
 using Ploeh.AutoFixture;
+using Ploeh.AutoFixture.Kernel;
 using Ploeh.AutoFixture.NUnit2;
 
-namespace SPOServiceUnitTests
+namespace DDMSWebServiceTest
 {
     [ExcludeFromCodeCoverage]
     public class SystemUnderTestFactory<TContract, TSystemUnderTest> where TSystemUnderTest : class, TContract
