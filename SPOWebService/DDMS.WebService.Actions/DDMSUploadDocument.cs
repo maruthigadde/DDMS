@@ -52,9 +52,9 @@ namespace DDMS.WebService.SPOActions
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                        String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
-                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
-                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv));
+                        String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
                         clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
 

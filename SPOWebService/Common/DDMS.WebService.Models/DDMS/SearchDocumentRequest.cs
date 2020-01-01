@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DDMS.WebService.Models
 {
+    [ExcludeFromCodeCoverage]
     public class SearchDocumentRequest
     {
         #region Private Fields

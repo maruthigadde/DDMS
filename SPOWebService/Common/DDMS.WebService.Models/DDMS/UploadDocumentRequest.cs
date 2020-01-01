@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DDMS.WebService.Models
 {
+    [ExcludeFromCodeCoverage]
     public class UploadDocumentRequest
     {
         #region Private Fields

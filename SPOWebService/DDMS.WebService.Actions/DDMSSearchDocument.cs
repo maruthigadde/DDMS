@@ -29,8 +29,15 @@ namespace DDMS.WebService.SPOActions
                 {
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
-                        secureString = new NetworkCredential("", EncryptDecrypt.SPOPassword).SecurePassword;
-                        clientContext.Credentials = new SharePointOnlineCredentials(EncryptDecrypt.SPOUserName, secureString);
+                        secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
+
+                        String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
+
+                        clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
 
                         if ((!string.IsNullOrEmpty(searchDocumentRequest.Version) && !string.IsNullOrWhiteSpace(searchDocumentRequest.Version)))
                             searchDocumentResponse = SearchDocument(clientContext, searchDocumentRequest);
@@ -59,8 +66,15 @@ namespace DDMS.WebService.SPOActions
                 Log.Info("In DDMSSearchAllOldVersions method");
                 using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                 {
-                    secureString = new NetworkCredential("", EncryptDecrypt.SPOPassword).SecurePassword;
-                    clientContext.Credentials = new SharePointOnlineCredentials(EncryptDecrypt.SPOUserName, secureString);
+                    secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
+
+                    String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
+                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
+
+                    clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
 
                     Microsoft.SharePoint.Client.File file = clientContext.Web.GetFileById(searchDocumentRequest.DocumentId);
                     ListItem listItem = file.ListItemAllFields;

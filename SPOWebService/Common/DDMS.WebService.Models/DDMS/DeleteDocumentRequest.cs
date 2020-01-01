@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DDMS.WebService.Models
 {
+    [ExcludeFromCodeCoverage]
     public class DeleteDocumentRequest
     {
         #region Private Fields

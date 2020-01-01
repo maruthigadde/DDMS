@@ -26,8 +26,15 @@ namespace DDMS.WebService.SPOActions
                     Log.Info("In DDMSDelete method");
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
-                        secureString = new NetworkCredential("", EncryptDecrypt.SPOPassword).SecurePassword;
-                        clientContext.Credentials = new SharePointOnlineCredentials(EncryptDecrypt.SPOUserName, secureString);
+                        secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
+                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
+
+                        String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
+                                    ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
+
+                        clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
                         if (!(string.IsNullOrEmpty(deleteDocumentRequest.Version) || string.IsNullOrWhiteSpace(deleteDocumentRequest.Version)))
                             DeleteByVersion(clientContext, deleteDocumentRequest);
                         if ((string.IsNullOrEmpty(deleteDocumentRequest.Version) || string.IsNullOrWhiteSpace(deleteDocumentRequest.Version)))
