@@ -34,10 +34,13 @@ namespace WebServiceUtility
                     fileContent = new byte[Convert.ToInt32(fileStream.Length)];
                     fileStream.Read(fileContent, 0, Convert.ToInt32(fileStream.Length));
                 }
-
-                string path = Directory.GetCurrentDirectory() + DateTime.Now.ToString("yyyy-dd-MM") + Path.GetFileNameWithoutExtension(openFileDialog.FileName) + ".txt";
+                string filename = Path.GetFileNameWithoutExtension(openFileDialog.FileName) + DateTime.Now.ToString("yyyy-dd-MM") + ".txt";
+                string path = Application.StartupPath + "\\" + filename;
                 File.WriteAllText(path, Convert.ToBase64String(fileContent));
-                MessageBox.Show("File Conversion Successful", "", MessageBoxButtons.OK);
+                MessageBox.Show("Conversion Successful. Filename : "
+                                + filename
+                                + "\nFile Path: "
+                                + Application.StartupPath, "", MessageBoxButtons.OK);
             }
             catch (Exception ex)
             {
