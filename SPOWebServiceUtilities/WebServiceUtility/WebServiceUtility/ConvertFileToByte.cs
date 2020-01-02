@@ -35,6 +35,7 @@ namespace WebServiceUtility
                     fileStream.Read(fileContent, 0, Convert.ToInt32(fileStream.Length));
                 }
                 string filename = Path.GetFileNameWithoutExtension(openFileDialog.FileName) + DateTime.Now.ToString("yyyy-dd-MM") + ".txt";
+                //save to the application executable folder
                 string path = Application.StartupPath + "\\" + filename;
                 File.WriteAllText(path, Convert.ToBase64String(fileContent));
                 MessageBox.Show("Conversion Successful. Filename : "
