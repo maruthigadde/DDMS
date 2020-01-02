@@ -1,10 +1,10 @@
-﻿using DDMS.WebService.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Text;
+using WebServiceClient.Models;
 
 namespace WebServiceClient
 {
@@ -84,17 +84,16 @@ namespace WebServiceClient
 
         private static void UploadDocument(Guid documentId, string filepath, string dealerNumber, string requestUser)
         {
-            FileStream fileStream = null;
             Byte[] fileContent = null;
-            UploadDocumentResponse hondaUploadDocumentResponse = null;
             try
             {
-                //string docPath = @"C:\Users\manjunathyadav.k\Desktop\Test.txt";
-                fileStream = File.OpenRead(filepath);
-                fileContent = new byte[Convert.ToInt32(fileStream.Length)];
-                fileStream.Read(fileContent, 0, Convert.ToInt32(fileStream.Length));
+                using (FileStream fileStream = File.OpenRead(filepath))
+                {
+                    fileContent = new byte[Convert.ToInt32(fileStream.Length)];
+                    fileStream.Read(fileContent, 0, Convert.ToInt32(fileStream.Length));
+                }                               
 
-                UploadDocumentRequest objHondaUpload = new UploadDocumentRequest
+                UploadDocumentRequest uploadRequest = new UploadDocumentRequest
                 {
                     DocumentId = documentId,
                     DocumentContent = fileContent,
@@ -104,39 +103,41 @@ namespace WebServiceClient
                 };
 
 
-                HttpWebRequest myHttpWebRequest = (HttpWebRequest)HttpWebRequest.Create(
-                                                            ConfigurationManager.AppSettings.Get("ServiceURL") + "/api/DDMS");
-                myHttpWebRequest.Headers.Add("Authorization", "Basic "
-                                                              + Convert.ToBase64String(Encoding.Default.GetBytes(ConfigurationManager.AppSettings.Get("UserName")
-                                                                                                                 + ":"
-                                                                                                                 + ConfigurationManager.AppSettings.Get("Password"))));
+                HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(
+                                                            ConfigurationManager.AppSettings.Get("ServiceURL"));
+                httpWebRequest.Headers.Add(Constants.Authorization,
+                    Constants.AuthenticationType
+                    + Convert.ToBase64String(Encoding.Default.GetBytes(ConfigurationManager.AppSettings.Get("UserName")
+                                                                       + ":"
+                                                                       + ConfigurationManager.AppSettings.Get("Password"))));
 
-                myHttpWebRequest.Headers.Add("messageId", Guid.NewGuid().ToString());
-                myHttpWebRequest.Headers.Add("siteId", "DDMS");
-                myHttpWebRequest.Headers.Add("businessId", "DDMS Documents");
-                myHttpWebRequest.Headers.Add("collectedTimestamp", DateTime.Now.ToString());
-                myHttpWebRequest.ContentType = "application/json";
-                myHttpWebRequest.Method = "POST";
-                myHttpWebRequest.Timeout = 3000000;
-                string sMessage = JsonConvert.SerializeObject(objHondaUpload);
-                using (var streamWriter = new StreamWriter(myHttpWebRequest.GetRequestStream()))
+                httpWebRequest.Headers.Add(Constants.MessageId, Guid.NewGuid().ToString());
+                httpWebRequest.Headers.Add(Constants.SiteId, HeaderValueConstants.SiteId);
+                httpWebRequest.Headers.Add(Constants.BusinessId, HeaderValueConstants.BusinessId);
+                httpWebRequest.Headers.Add(Constants.CollectedTimeStamp, DateTime.Now.ToString());
+                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.Method = "POST";
+                httpWebRequest.Timeout = 180000;
+                string sMessage = JsonConvert.SerializeObject(uploadRequest);
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
                 {
                     streamWriter.Write(sMessage);
                     streamWriter.Flush();
                     streamWriter.Close();
                 }
-                HttpWebResponse myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                Stream responseStream = myHttpWebResponse.GetResponseStream();
+                HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                Stream responseStream = httpWebResponse.GetResponseStream();
                 StreamReader myStreamReader = new StreamReader(responseStream, Encoding.Default);
                 string pageContent = myStreamReader.ReadToEnd();
+                
                 myStreamReader.Close();
                 responseStream.Close();
-                hondaUploadDocumentResponse = JsonConvert.DeserializeObject<UploadDocumentResponse>(pageContent);
-
+                //Deserialize response content
                 var response = JsonConvert.DeserializeObject(pageContent);
-                Console.WriteLine("StatusCode :" + myHttpWebResponse.StatusCode);
+                Console.WriteLine("StatusCode :" + httpWebResponse.StatusCode);
                 Console.WriteLine("Response :" + response);
-               
+                
+
             }
 
             catch (WebException webex)
@@ -159,34 +160,33 @@ namespace WebServiceClient
 
         private static void SearchDocument(Guid guid, string version)
         {
-            HttpWebRequest myHttpWebRequest = null;
+            HttpWebRequest httpWebRequest = null;
             try
             {
                 if (string.IsNullOrEmpty(version) || string.IsNullOrWhiteSpace(version))
-                    myHttpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
-                                                                             + "/api/DDMS/"
-                                                                             + guid);
+                    httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
+                                                                                                             + guid);
                 else
-                    myHttpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
-                                                                             + "/api/DDMS/"
+                    httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
                                                                              + guid
                                                                              + "/"
                                                                              + version
                                                                              + "/");
-                myHttpWebRequest.Headers.Add("Authorization", "Basic "
-                                                              + Convert.ToBase64String(Encoding.Default.GetBytes(ConfigurationManager.AppSettings.Get("UserName")
-                                                                                                                 + ":"
-                                                                                                                 + ConfigurationManager.AppSettings.Get("Password"))));
-                myHttpWebRequest.Headers.Add("messageId", Guid.NewGuid().ToString());
-                myHttpWebRequest.Headers.Add("siteId", "DDMS");
-                myHttpWebRequest.Headers.Add("businessId", "DDMS Documents");
-                myHttpWebRequest.Headers.Add("collectedTimestamp", DateTime.Now.ToString());
-                myHttpWebRequest.ContentType = "application/json";
-                myHttpWebRequest.Method = "GET";
-                myHttpWebRequest.Timeout = 3000000;
+                httpWebRequest.Headers.Add(Constants.Authorization,
+                    Constants.AuthenticationType
+                    + Convert.ToBase64String(Encoding.Default.GetBytes(ConfigurationManager.AppSettings.Get("UserName")
+                                                                       + ":"
+                                                                       + ConfigurationManager.AppSettings.Get("Password"))));
+                httpWebRequest.Headers.Add(Constants.MessageId, Guid.NewGuid().ToString());
+                httpWebRequest.Headers.Add(Constants.SiteId, HeaderValueConstants.SiteId);
+                httpWebRequest.Headers.Add(Constants.BusinessId, HeaderValueConstants.BusinessId);
+                httpWebRequest.Headers.Add(Constants.CollectedTimeStamp, DateTime.Now.ToString());
+                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.Method = "GET";
+                httpWebRequest.Timeout = 180000;
 
-                HttpWebResponse myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                Stream responseStream = myHttpWebResponse.GetResponseStream();
+                HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                Stream responseStream = httpWebResponse.GetResponseStream();
                 StreamReader myStreamReader = new StreamReader(responseStream, Encoding.Default);
                 string pageContent = myStreamReader.ReadToEnd();
                 myStreamReader.Close();
@@ -194,7 +194,7 @@ namespace WebServiceClient
 
                 var response = JsonConvert.DeserializeObject(pageContent);
                 Console.WriteLine("Response :" + response);
-               
+
             }
             catch (WebException webex)
             {
@@ -215,34 +215,34 @@ namespace WebServiceClient
 
         private static void DeleteDocument(Guid guid, string version)
         {
-            HttpWebRequest myHttpWebRequest = null;
+            HttpWebRequest httpWebRequest = null;
             try
             {
                 if (string.IsNullOrEmpty(version) || string.IsNullOrWhiteSpace(version))
-                    myHttpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
-                                                                             + "/api/DDMS/"
+                    httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")                                                                             
                                                                              + guid);
                 else
-                    myHttpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
-                                                                             + "/api/DDMS/"
+                    httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
                                                                              + guid
                                                                              + "/"
                                                                              + version
                                                                              + "/");
-                myHttpWebRequest.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(ConfigurationManager.AppSettings.Get("UserName")
-                                                                                                                           + ":"
-                                                                                                                           + ConfigurationManager.AppSettings.Get("Password"))));
-                myHttpWebRequest.Headers.Add("messageId", Guid.NewGuid().ToString());
-                myHttpWebRequest.Headers.Add("siteId", "DDMS");
-                myHttpWebRequest.Headers.Add("businessId", "DDMS Documents");
-                myHttpWebRequest.Headers.Add("collectedTimestamp", DateTime.Now.ToString());
+                httpWebRequest.Headers.Add(Constants.Authorization,
+                    Constants.AuthenticationType
+                    + Convert.ToBase64String(Encoding.Default.GetBytes(ConfigurationManager.AppSettings.Get("UserName")
+                                                                       + ":"
+                                                                       + ConfigurationManager.AppSettings.Get("Password"))));
+                httpWebRequest.Headers.Add(Constants.MessageId, Guid.NewGuid().ToString());
+                httpWebRequest.Headers.Add(Constants.SiteId, HeaderValueConstants.SiteId);
+                httpWebRequest.Headers.Add(Constants.BusinessId, HeaderValueConstants.BusinessId);
+                httpWebRequest.Headers.Add(Constants.CollectedTimeStamp, DateTime.Now.ToString());
 
-                myHttpWebRequest.ContentType = "application/json";
-                myHttpWebRequest.Method = "DELETE";
-                myHttpWebRequest.Timeout = 3000000;
+                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.Method = "DELETE";
+                httpWebRequest.Timeout = 180000;
 
-                HttpWebResponse myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                Stream responseStream = myHttpWebResponse.GetResponseStream();
+                HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                Stream responseStream = httpWebResponse.GetResponseStream();
                 StreamReader myStreamReader = new StreamReader(responseStream, Encoding.Default);
                 string pageContent = myStreamReader.ReadToEnd();
                 myStreamReader.Close();
@@ -250,7 +250,7 @@ namespace WebServiceClient
 
                 var response = JsonConvert.DeserializeObject(pageContent);
                 Console.WriteLine("Response :" + response);
-               
+
             }
             catch (WebException webex)
             {
