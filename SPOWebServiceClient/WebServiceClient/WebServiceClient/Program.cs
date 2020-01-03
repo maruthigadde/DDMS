@@ -192,6 +192,7 @@ namespace WebServiceClient
                 myStreamReader.Close();
                 responseStream.Close();
 
+                Console.WriteLine("StatusCode :" + httpWebResponse.StatusCode);
                 var response = JsonConvert.DeserializeObject(pageContent);
                 Console.WriteLine("Response :" + response);
 
@@ -248,6 +249,7 @@ namespace WebServiceClient
                 myStreamReader.Close();
                 responseStream.Close();
 
+                Console.WriteLine("StatusCode :" + httpWebResponse.StatusCode);
                 var response = JsonConvert.DeserializeObject(pageContent);
                 Console.WriteLine("Response :" + response);
 
