@@ -134,9 +134,9 @@ namespace DDMS.WebService.SPOActions
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                   String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
-                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
-                               ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
+                    String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
+                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
                     clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
                     Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
@@ -189,7 +189,7 @@ namespace DDMS.WebService.SPOActions
                                 uploadDocumentResponse.ErrorMessage = ErrorMessage.UpDateFailed;
                             }
                         }
-                        if (uploadDocumentRequest.DocumentContent.Length >= SpoConstants.MaxFileSize)
+                        if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length > SpoConstants.MaxFileSize)
                         {
                             Log.DebugFormat("In UploadDocument method - {0}", ErrorMessage.MaxFileSizeContentReached);
                             uploadDocumentResponse.ErrorMessage = ErrorMessage.MaxFileSizeContentReached;

@@ -33,14 +33,14 @@ namespace SPOService.LogManager
 
                 filePath = logDirectory + logPath + "\\" + dateTime + "\\" + FileId + LoggerConfigurationConstants.FileExtension;
 
+                hierarchy.Root.RemoveAllAppenders();
+
                 patternLayout.ConversionPattern = LoggerConfigurationConstants.ConversionPattern;
                 patternLayout.ActivateOptions();
 
                 roller.AppendToFile = true;
                 roller.File = filePath;
                 roller.Layout = patternLayout;
-                roller.MaxSizeRollBackups = 5;
-                roller.RollingStyle = RollingFileAppender.RollingMode.Size;
                 roller.StaticLogFileName = true;
                 roller.ActivateOptions();
                 hierarchy.Root.AddAppender(roller);

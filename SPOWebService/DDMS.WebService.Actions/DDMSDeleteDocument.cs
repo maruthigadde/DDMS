@@ -82,9 +82,9 @@ namespace DDMS.WebService.SPOActions
                 Log.Info("In DeleteAllversions method");
                 File file = clientContext.Web.GetFileById(deleteDocumentRequest.DocumentId);
                 clientContext.Load(file);
-                file.DeleteObject();
+                ClientResult<Guid> recycle = file.Recycle();
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
-                Log.Info("In DeleteAllversions after ExecuteQueryWithRetry - Document Deleted");
+                Log.Info("In DeleteAllversions after ExecuteQueryWithRetry - Document Deleted: " + recycle.Value.ToString());
             }
             catch (Exception e)
             {
@@ -101,7 +101,7 @@ namespace DDMS.WebService.SPOActions
                 FileVersionCollection fileVersions = file.Versions;
                 clientContext.Load(file);
                 clientContext.Load(fileVersions);
-                fileVersions.DeleteByLabel(deleteDocumentRequest.Version);
+                fileVersions.RecycleByLabel(deleteDocumentRequest.Version);
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                 Log.DebugFormat("In DeleteByVersion after ExecuteQueryWithRetry - Document Deleted for Version {0}", deleteDocumentRequest.Version);
             }

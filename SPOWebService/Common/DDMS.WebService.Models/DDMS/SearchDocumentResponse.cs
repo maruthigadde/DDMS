@@ -16,9 +16,6 @@ namespace DDMS.WebService.Models
         private byte[] _documentcontent;
         private string _dealernumber;
         private string _requestuser;
-        private string _documentumid;
-        private string _documentumversion;
-        //private string _correlationid;
         private string _errormessage;
         #endregion
 
@@ -78,39 +75,6 @@ namespace DDMS.WebService.Models
                 this._requestuser = value;
             }
         }
-        public string DocumentumId
-        {
-            get
-            {
-                return this._documentumid;
-            }
-            set
-            {
-                this._documentumid = value;
-            }
-        }
-        public string DocumentumVersion
-        {
-            get
-            {
-                return this._documentumversion;
-            }
-            set
-            {
-                this._documentumversion = value;
-            }
-        }
-        //public string CorrelationId
-        //{
-        //    get
-        //    {
-        //        return this._correlationid;
-        //    }
-        //    set
-        //    {
-        //        this._correlationid = value;
-        //    }
-        //}
         public string ErrorMessage
         {
             get

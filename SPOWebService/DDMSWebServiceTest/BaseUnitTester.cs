@@ -1,8 +1,10 @@
 ﻿using Ploeh.AutoFixture;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DDMSWebServiceTest
 {
+    [ExcludeFromCodeCoverage]
     public abstract class BaseUnitTester
     {
         protected Fixture Fixture;
@@ -18,6 +20,7 @@ namespace DDMSWebServiceTest
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public abstract class BaseUnitTester<TContract, TSystemUnderTest> : BaseUnitTester where TSystemUnderTest : class, TContract
     {
         public SystemUnderTestFactory<TContract, TSystemUnderTest> SutFactory { get; set; }
@@ -28,5 +31,6 @@ namespace DDMSWebServiceTest
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public abstract class BaseUnitTester<TSystemUnderTest> : BaseUnitTester<TSystemUnderTest, TSystemUnderTest> where TSystemUnderTest : class { }
 }

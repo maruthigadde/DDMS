@@ -169,9 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseUnitTester.cs" />
-    <Compile Include="DDMS.WebService\DDMS.WebService.SPOAction\DDMSDeleteDocumentTest.cs" />
-    <Compile Include="DDMS.WebService\DDMS.WebService.SPOAction\DDMSSearchDocumentTest.cs" />
-    <Compile Include="DDMS.WebService\DDMS.WebService.SPOAction\DDMSUploadDocumentTest.cs" />
+    <Compile Include="DDMS.WebService\DDMS.WebService.SPOAction\DDMSTest.cs" />
     <Compile Include="LocalAddin.cs" />
     <Compile Include="SystemUnderTestFactory.cs" />
     <Compile Include="TestDataConstants.cs" />

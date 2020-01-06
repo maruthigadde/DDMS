@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Configuration;
 using System.IO;
@@ -17,6 +18,7 @@ namespace WebServiceClient
             {
                 Console.WriteLine("Please select the operation\n 1.Upload\n 2.Search\n 3.Delete\n");
                 input = Console.ReadLine();
+
 
                 if (input.ToUpper() == "SEARCH" || input.ToUpper() == "UPLOAD" || input.ToUpper() == "DELETE")
                     DDMSAPI(input);
@@ -91,7 +93,7 @@ namespace WebServiceClient
                 {
                     fileContent = new byte[Convert.ToInt32(fileStream.Length)];
                     fileStream.Read(fileContent, 0, Convert.ToInt32(fileStream.Length));
-                }                               
+                }
 
                 UploadDocumentRequest uploadRequest = new UploadDocumentRequest
                 {
@@ -129,14 +131,14 @@ namespace WebServiceClient
                 Stream responseStream = httpWebResponse.GetResponseStream();
                 StreamReader myStreamReader = new StreamReader(responseStream, Encoding.Default);
                 string pageContent = myStreamReader.ReadToEnd();
-                
+
                 myStreamReader.Close();
                 responseStream.Close();
                 //Deserialize response content
                 var response = JsonConvert.DeserializeObject(pageContent);
                 Console.WriteLine("StatusCode :" + httpWebResponse.StatusCode);
                 Console.WriteLine("Response :" + response);
-                
+
 
             }
 
@@ -193,8 +195,19 @@ namespace WebServiceClient
                 responseStream.Close();
 
                 Console.WriteLine("StatusCode :" + httpWebResponse.StatusCode);
-                var response = JsonConvert.DeserializeObject(pageContent);
-                Console.WriteLine("Response :" + response);
+                var response = JObject.Parse(pageContent);
+
+                string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                                                                            + ConfigurationManager.AppSettings.Get("DownloadPath"));
+
+                if (!Directory.Exists(downloadPath))
+                    Directory.CreateDirectory(downloadPath);
+                if (response.ContainsKey("documentContent"))
+                    if (!string.IsNullOrEmpty((string)response["documentContent"]))
+                    {
+                        File.WriteAllBytes(downloadPath + "\\" + response["documentName"], Convert.FromBase64String(response["documentContent"].ToString()));
+                        Console.WriteLine("File Downloaded to Path :" + downloadPath + "\\" + response["documentName"]);
+                    }
 
             }
             catch (WebException webex)
@@ -220,7 +233,7 @@ namespace WebServiceClient
             try
             {
                 if (string.IsNullOrEmpty(version) || string.IsNullOrWhiteSpace(version))
-                    httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")                                                                             
+                    httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")
                                                                              + guid);
                 else
                     httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(ConfigurationManager.AppSettings.Get("ServiceURL")

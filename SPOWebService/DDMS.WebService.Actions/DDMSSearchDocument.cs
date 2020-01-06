@@ -57,8 +57,9 @@ namespace DDMS.WebService.SPOActions
             }
             return searchDocumentResponse;
         }
-        public List<SearchDocumentAllVersionsResponse> DDMSSearchAllOldVersions(SearchDocumentRequest searchDocumentRequest)
+        public SearchDocumentAllMetaDataVersions DDMSSearchAllOldVersions(SearchDocumentRequest searchDocumentRequest)
         {
+            SearchDocumentAllMetaDataVersions searchDocumentAllMetaDataVersions = new SearchDocumentAllMetaDataVersions();
             List<SearchDocumentAllVersionsResponse> listSearchDocumentResponse = new List<SearchDocumentAllVersionsResponse>();
             SecureString secureString = null;
             try
@@ -80,7 +81,10 @@ namespace DDMS.WebService.SPOActions
                     ListItem listItem = file.ListItemAllFields;
                     ListItemVersionCollection versions = listItem.Versions;
                     clientContext.Load(file);
-                    clientContext.Load(listItem);
+                    clientContext.Load(listItem, item => item[SpoConstants.Title],
+                                             item => item[SpoConstants.DealerNumber],
+                                             item => item[SpoConstants.RequestUser],
+                                             item => item[SpoConstants.Version]);
                     clientContext.Load(versions);
                     clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                     Log.Info("In DDMSSearchAllOldVersions method after ExecuteQueryWithRetry");
@@ -95,41 +99,38 @@ namespace DDMS.WebService.SPOActions
                                 searchDocumentResponse.DealerNumber = item.Value.ToString();
                             if (item.Key == SpoConstants.RequestUser && item.Value != null)
                                 searchDocumentResponse.RequestUser = item.Value.ToString();
-                            if (item.Key == SpoConstants.DocumentumId && item.Value != null)
-                                searchDocumentResponse.DocumentumId = item.Value.ToString();
-                            if (item.Key == SpoConstants.DocumentumVersion && item.Value != null)
-                                searchDocumentResponse.DocumentumVersion = item.Value.ToString();
                             if (item.Key == SpoConstants.Version && item.Value != null)
                                 searchDocumentResponse.Version = item.Value.ToString();
                         }
                         listSearchDocumentResponse.Add(searchDocumentResponse);
                     }
                 }
+                searchDocumentAllMetaDataVersions.SearchMetadata = listSearchDocumentResponse;
             }
             catch (WebException e) when (e.Status == WebExceptionStatus.NameResolutionFailure)
             {
                 Log.ErrorFormat("WebException in DDMSSearchAllOldVersions method :{0}", e.Message);
-                throw new Exception(ErrorMessage.RemoteName);
+                searchDocumentAllMetaDataVersions.ErrorMessage = ErrorMessage.RemoteName;
             }
             catch (ServerException ex)
             {
                 Log.ErrorFormat("ServerException in DDMSSearchAllOldVersions method :{0}", ex.Message);
                 if (ex.ServerErrorTypeName == ErrorException.SystemIoFileNotFound)
-                    throw new Exception(ErrorMessage.FileNotFound);
+                    searchDocumentAllMetaDataVersions.ErrorMessage = ErrorMessage.FileNotFound;
                 else
-                    throw new Exception(ex.Message);
+                    searchDocumentAllMetaDataVersions.ErrorMessage = ex.Message;
             }
             catch (ArgumentException e)
             {
                 Log.ErrorFormat("ArgumentException in DDMSSearchAllOldVersions method :{0}", e.Message);
-                throw new Exception(e.Message);
+                searchDocumentAllMetaDataVersions.ErrorMessage = e.Message;
             }
             catch (Exception ex)
             {
                 Log.ErrorFormat("Exception in DDMSSearchAllOldVersions method :{0}", ex.Message);
-                throw new Exception(ex.Message);
+                searchDocumentAllMetaDataVersions.ErrorMessage = ex.Message;
             }
-            return listSearchDocumentResponse;
+            return searchDocumentAllMetaDataVersions;
         }
         #endregion
 
@@ -199,10 +200,14 @@ namespace DDMS.WebService.SPOActions
                 FileVersion fileVersions = listItem.File.Versions.GetById(requestedVersion);
                 ClientResult<Stream> clientResult = fileVersions.OpenBinaryStream();
                 clientContext.Load(list);
-                clientContext.Load(listItem);
+                clientContext.Load(listItem, item => item[SpoConstants.Title],
+                                             item => item[SpoConstants.DealerNumber],
+                                             item => item[SpoConstants.RequestUser],
+                                             item => item[SpoConstants.Version]);
                 clientContext.Load(listItemVersions);
                 clientContext.Load(fileVersions);
-                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount,
+                                                    ExecuteQueryConstants.RetryDelayTime);
                 using (MemoryStream mStream = new MemoryStream())
                 {
                     if (clientResult != null)
@@ -218,10 +223,6 @@ namespace DDMS.WebService.SPOActions
                                 searchDocumentResponse.DealerNumber = item.Value.ToString();
                             if (item.Key == SpoConstants.RequestUser && item.Value != null)
                                 searchDocumentResponse.RequestUser = item.Value.ToString();
-                            if (item.Key == SpoConstants.DocumentumId && item.Value != null)
-                                searchDocumentResponse.DocumentumId = item.Value.ToString();
-                            if (item.Key == SpoConstants.DocumentumVersion && item.Value != null)
-                                searchDocumentResponse.DocumentumVersion = item.Value.ToString();
                             if (item.Key == SpoConstants.Version && item.Value != null)
                                 searchDocumentResponse.Version = item.Value.ToString();
                         }
@@ -264,7 +265,10 @@ namespace DDMS.WebService.SPOActions
                 Microsoft.SharePoint.Client.File file = clientContext.Web.GetFileById(searchDocumentRequest.DocumentId);
                 ListItem oListItem = file.ListItemAllFields;
                 clientContext.Load(file);
-                clientContext.Load(oListItem);
+                clientContext.Load(oListItem, item => item[SpoConstants.Title],
+                                             item => item[SpoConstants.DealerNumber],
+                                             item => item[SpoConstants.RequestUser],
+                                             item => item[SpoConstants.Version]);
                 ClientResult<Stream> clientResult = file.OpenBinaryStream();
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                 using (MemoryStream mStream = new MemoryStream())
@@ -283,10 +287,6 @@ namespace DDMS.WebService.SPOActions
                                 searchDocumentResponse.DealerNumber = item.Value.ToString();
                             if (item.Key == SpoConstants.RequestUser && item.Value != null)
                                 searchDocumentResponse.RequestUser = item.Value.ToString();
-                            if (item.Key == SpoConstants.DocumentumId && item.Value != null)
-                                searchDocumentResponse.DocumentumId = item.Value.ToString();
-                            if (item.Key == SpoConstants.DocumentumVersion && item.Value != null)
-                                searchDocumentResponse.DocumentumVersion = item.Value.ToString();
                             if (item.Key == SpoConstants.Version && item.Value != null)
                                 searchDocumentResponse.Version = item.Value.ToString();
                         }

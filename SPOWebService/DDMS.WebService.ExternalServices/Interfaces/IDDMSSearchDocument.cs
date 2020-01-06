@@ -10,7 +10,6 @@ namespace DDMS.WebService.ExternalServices.Interfaces
     public interface IDDMSSearchDocument
     {
         SearchDocumentResponse DDMSSearch(SearchDocumentRequest hondaSearchDocumentRequest);
-        List<SearchDocumentAllVersionsResponse> DDMSSearchAllOldVersions(SearchDocumentRequest hondaSearchDocumentRequest);
-        //SearchDocumentResponse SearchDocumentByVersion(SearchDocumentRequest hondaSearchDocumentRequest);
+        SearchDocumentAllMetaDataVersions DDMSSearchAllOldVersions(SearchDocumentRequest hondaSearchDocumentRequest);
     }
 }
