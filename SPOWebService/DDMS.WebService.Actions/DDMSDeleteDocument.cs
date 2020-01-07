@@ -7,7 +7,6 @@ using System.Configuration;
 using System.Security;
 using System.Net;
 using log4net;
-using SPOService.EncryptConfiguration;
 
 namespace DDMS.WebService.SPOActions
 {
@@ -26,11 +25,11 @@ namespace DDMS.WebService.SPOActions
                     Log.Info("In DDMSDelete method");
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
-                        secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                        secureString = new NetworkCredential("", HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                        String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                        String username = HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
@@ -59,11 +58,6 @@ namespace DDMS.WebService.SPOActions
                     deleteDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
                 else
                     deleteDocumentResponse.ErrorMessage = ex.Message;
-            }
-            catch (ArgumentException e)
-            {
-                Log.ErrorFormat("ArgumentException in DDMSDelete method :{0}", e.Message);
-                deleteDocumentResponse.ErrorMessage = e.Message;
             }
             catch (Exception ex)
             {

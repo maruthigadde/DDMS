@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using WebServiceClient.Models;
@@ -16,20 +17,34 @@ namespace WebServiceClient
             string input = string.Empty;
             try
             {
-                Console.WriteLine("Please select the operation\n 1.Upload\n 2.Search\n 3.Delete\n");
-                input = Console.ReadLine();
+                if (ConfigurationManager.AppSettings.AllKeys.Contains("UserName") && ConfigurationManager.AppSettings.AllKeys.Contains("Password"))
+                {
+                    if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings.Get("UserName")) && !string.IsNullOrEmpty(ConfigurationManager.AppSettings.Get("Password")))
+                    {
+                        Console.WriteLine("Please select the operation\n 1.Upload\n 2.Search\n 3.Delete\n");
+                        input = Console.ReadLine();
 
 
-                if (input.ToUpper() == "SEARCH" || input.ToUpper() == "UPLOAD" || input.ToUpper() == "DELETE")
-                    DDMSAPI(input);
-
+                        if (input.ToUpper() == "SEARCH" || input.ToUpper() == "UPLOAD" || input.ToUpper() == "DELETE")
+                            DDMSAPI(input);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please configure user credentials in App.config and re-run");
+                        Console.ReadLine();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Please configure user credentials in App.config and re-run");
+                    Console.ReadLine();
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.ReadLine();
             }
-
         }
 
         private static void DDMSAPI(string operation)

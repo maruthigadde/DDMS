@@ -11,6 +11,5 @@ namespace DDMS.WebService.ExternalServices.Interfaces
     public interface IDDMSUploadDocument
     {
         UploadDocumentResponse DDMSUpload(UploadDocumentRequest uploadDocumentRequest);
-        //UploadDocumentResponse DDMSUploadUsingRestApi(UploadDocumentRequest uploadDocumentRequest);
     }
 }

@@ -9,8 +9,6 @@ using System.Configuration;
 using System.Security;
 using System.Net;
 using log4net;
-using SPOService.EncryptConfiguration;
-using SPOService.LogManager;
 
 namespace DDMS.WebService.SPOActions
 {
@@ -29,11 +27,11 @@ namespace DDMS.WebService.SPOActions
                 {
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
-                        secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                        secureString = new NetworkCredential("", HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                        String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                        String username = HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
@@ -67,11 +65,11 @@ namespace DDMS.WebService.SPOActions
                 Log.Info("In DDMSSearchAllOldVersions method");
                 using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                 {
-                    secureString = new NetworkCredential("", EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                    secureString = new NetworkCredential("", HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                    String username = EncryptDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                    String username = HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
@@ -120,11 +118,6 @@ namespace DDMS.WebService.SPOActions
                 else
                     searchDocumentAllMetaDataVersions.ErrorMessage = ex.Message;
             }
-            catch (ArgumentException e)
-            {
-                Log.ErrorFormat("ArgumentException in DDMSSearchAllOldVersions method :{0}", e.Message);
-                searchDocumentAllMetaDataVersions.ErrorMessage = e.Message;
-            }
             catch (Exception ex)
             {
                 Log.ErrorFormat("Exception in DDMSSearchAllOldVersions method :{0}", ex.Message);
@@ -162,24 +155,6 @@ namespace DDMS.WebService.SPOActions
                     }
                 }
                 Log.Info("Out SearchDocument method");
-            }
-            catch (WebException e) when (e.Status == WebExceptionStatus.NameResolutionFailure)
-            {
-                Log.ErrorFormat("WebException in SearchDocument method :{0}", e.Message);
-                searchDocumentResponse.ErrorMessage = ErrorMessage.RemoteName;
-            }
-            catch (ServerException ex)
-            {
-                Log.ErrorFormat("ServerException in SearchDocument method :{0}", ex.Message);
-                if (ex.ServerErrorTypeName == ErrorException.SystemIoFileNotFound)
-                    searchDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
-                else
-                    searchDocumentResponse.ErrorMessage = ex.Message;
-            }
-            catch (ArgumentException e)
-            {
-                Log.ErrorFormat("ArgumentException in SearchDocument method :{0}", e.Message);
-                searchDocumentResponse.ErrorMessage = e.Message;
             }
             catch (Exception ex)
             {
@@ -243,11 +218,6 @@ namespace DDMS.WebService.SPOActions
                 else
                     searchDocumentResponse.ErrorMessage = ex.Message;
             }
-            catch (ArgumentException e)
-            {
-                Log.ErrorFormat("ArgumentException in SearchDocumentByVersion method :{0}", e.Message);
-                searchDocumentResponse.ErrorMessage = e.Message;
-            }
             catch (Exception ex)
             {
                 Log.ErrorFormat("Exception in SearchDocumentByVersion method :{0}", ex.Message);
@@ -306,11 +276,6 @@ namespace DDMS.WebService.SPOActions
                     searchDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
                 else
                     searchDocumentResponse.ErrorMessage = ex.Message;
-            }
-            catch (ArgumentException e)
-            {
-                Log.ErrorFormat("ArgumentException in SearchDocumentCurrentVersion method :{0}", e.Message);
-                searchDocumentResponse.ErrorMessage = e.Message;
             }
             catch (Exception ex)
             {
