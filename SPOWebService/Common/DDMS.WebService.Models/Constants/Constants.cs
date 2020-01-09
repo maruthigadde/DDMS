@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace DDMS.WebService.Models.Common
+namespace DDMS.WebService.Constants
 {
     [ExcludeFromCodeCoverage]
     public static class ConfigurationConstants

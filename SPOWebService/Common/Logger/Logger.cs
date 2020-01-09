@@ -1,4 +1,4 @@
-﻿using DDMS.WebService.Models.Common;
+﻿using DDMS.WebService.Constants;
 using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
@@ -7,7 +7,7 @@ using System;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 
-namespace SPOService.LogManager
+namespace SPOService.Helper
 {
     [ExcludeFromCodeCoverage]
     public class Logger

@@ -1,5 +1,5 @@
-﻿using DDMS.WebService.Models;
-using DDMS.WebService.Models.Common;
+﻿using DDMS.WebService.Constants;
+using DDMS.WebService.Models;
 using DDMS.WebService.SPOActions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;

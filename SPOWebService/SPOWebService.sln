@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService", "DDMS.Web
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDMS.WebService.Models", "Common\DDMS.WebService.Models\DDMS.WebService.Models.csproj", "{66307A85-DDA0-4E7F-A0BA-A873C4207D11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPOService.LogManager", "Common\Logger\SPOService.LogManager.csproj", "{9EAB65B9-DAD2-4D5A-9125-F0AF64C9C822}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPOService.Helper", "Common\Logger\SPOService.Helper.csproj", "{9EAB65B9-DAD2-4D5A-9125-F0AF64C9C822}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{6D580D13-466D-48AB-9739-FFB860A14108}"
 EndProject

@@ -1,6 +1,7 @@
 ﻿using System;
 using DDMS.WebService.Models;
-using DDMS.WebService.Models.Common;
+using SPOService.Helper;
+using DDMS.WebService.Constants;
 using DDMS.WebService.ExternalServices.Interfaces;
 using Microsoft.SharePoint.Client;
 using System.Configuration;
@@ -25,11 +26,11 @@ namespace DDMS.WebService.SPOActions
                     Log.Info("In DDMSDelete method");
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
-                        secureString = new NetworkCredential("", HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                        secureString = new NetworkCredential("", CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                        String username = HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                        String username = CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 

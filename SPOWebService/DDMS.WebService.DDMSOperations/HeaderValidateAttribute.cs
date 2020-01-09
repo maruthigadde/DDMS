@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using DDMS.WebService.Models.Common;
+using DDMS.WebService.Constants;
 
 namespace DDMS.WebService.DDMSOperations
 {

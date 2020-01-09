@@ -3,10 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DDMS.WebService.Models.Common
+namespace SPOService.Helper
 {
     [ExcludeFromCodeCoverage]
-    public class HelperDecrypt
+    public class CommonHelper
     {
         public static readonly int KeyBitSize = 256;
         public static string Decrypt(string Encryptedstring, string Key, string Iv)

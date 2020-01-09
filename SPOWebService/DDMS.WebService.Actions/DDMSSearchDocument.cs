@@ -1,14 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using DDMS.WebService.Models;
-using DDMS.WebService.Models.Common;
+﻿using DDMS.WebService.Constants;
 using DDMS.WebService.ExternalServices.Interfaces;
-using Microsoft.SharePoint.Client;
-using System.Configuration;
-using System.Security;
-using System.Net;
+using DDMS.WebService.Models;
+using SPOService.Helper;
 using log4net;
+using Microsoft.SharePoint.Client;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Net;
+using System.Security;
 
 namespace DDMS.WebService.SPOActions
 {
@@ -27,11 +28,11 @@ namespace DDMS.WebService.SPOActions
                 {
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
-                        secureString = new NetworkCredential("", HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                        secureString = new NetworkCredential("", CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                        String username = HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                        String username = CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
@@ -65,11 +66,11 @@ namespace DDMS.WebService.SPOActions
                 Log.Info("In DDMSSearchAllOldVersions method");
                 using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                 {
-                    secureString = new NetworkCredential("", HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
+                    secureString = new NetworkCredential("", CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                    String username = HelperDecrypt.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
+                    String username = CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
