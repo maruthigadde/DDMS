@@ -5,9 +5,7 @@ namespace DDMS.WebService.Constants
     [ExcludeFromCodeCoverage]
     public static class ConfigurationConstants
     {
-        //public const string SPOSiteId = "SPOSiteId";
-        //public const string SPOSiteIdKey = "SPOSiteIdKey";
-        //public const string SPOSiteIdIv = "SPOSiteIdIv";
+      
         public const string SPOUserName = "SPOUserName";
         public const string SPOUserNameKey = "SPOUserNameKey";
         public const string SPOUserNameIv = "SPOUserNameIv";
@@ -17,6 +15,7 @@ namespace DDMS.WebService.Constants
 
         public const string SPOSiteURL = "SPOSiteURL";
         public const string SPOFolder = "SPOFolder";
+        public const string SPORelativeURL = "SPORelativeURL";
     }
 
     [ExcludeFromCodeCoverage]
@@ -38,6 +37,7 @@ namespace DDMS.WebService.Constants
     public static class SpoConstants
     {
         public const string Title = "Title";
+        public const string Name = "FileLeafRef";
         public const string DealerNumber = "DealerNumber";
         public const string ClaimNumber = "ClaimNumber";
         public const string ClaimSubmDate = "ClaimSubmDate";
@@ -51,7 +51,7 @@ namespace DDMS.WebService.Constants
         public const string DocumentumId = "DocumentumId";
         public const string DocumentumVersion = "DocumentumVersion";
         public const bool OverRideExistingVersion = true;
-        public const int MaxFileSize = 31457280;
+        public const string MaxFileSize = "MaximumFileSizeAllowed";
         public const string DocumentId = "documentId";
     }
     [ExcludeFromCodeCoverage]

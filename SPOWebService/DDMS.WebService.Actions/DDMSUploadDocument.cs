@@ -15,17 +15,25 @@ namespace DDMS.WebService.SPOActions
     {
         private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(DDMSUploadDocument));
         #region Public Member Functions 
-        public UploadDocumentResponse DDMSUpload(UploadDocumentRequest uploadDocumentRequest)
+        /// <summary>
+        /// Method to upload document to SPO library
+        /// </summary>
+        /// <param name="uploadDocumentRequest">Request Model format for Upload functionality</param>
+        /// <param name="LoggerId">MessageId will be used for logging information</param>
+        /// <returns></returns>
+        public UploadDocumentResponse DDMSUpload(UploadDocumentRequest uploadDocumentRequest, string LoggerId)
         {
             UploadDocumentResponse uploadDocumentResponse = new UploadDocumentResponse();
             try
             {
-                Log.Info("In DDMSUpload method");
+                Log.DebugFormat("In DDMSUpload method for MessageId - {0}", LoggerId);
                 if (uploadDocumentRequest.DocumentId != Guid.Empty)
-                    uploadDocumentResponse = UpdateDocument(uploadDocumentRequest);
+                   //if documentid is passed in request, an existing document will be updated
+                    uploadDocumentResponse = UpdateDocument(uploadDocumentRequest, LoggerId);
                 else
-                    uploadDocumentResponse = UploadDocument(uploadDocumentRequest);
-                Log.Info("Out of DDMSUpload method");
+                    //if documentid is empty or not passed in request, a new document is uploaded
+                    uploadDocumentResponse = UploadDocument(uploadDocumentRequest, LoggerId);
+                Log.DebugFormat("Out of DDMSUpload method for MessageId - {0}", LoggerId);
             }
             catch (Exception e)
             {
@@ -37,17 +45,24 @@ namespace DDMS.WebService.SPOActions
         #endregion
 
         #region Private Member Functions
-        private UploadDocumentResponse UploadDocument(UploadDocumentRequest uploadDocumentRequest)
+        /// <summary>
+        /// Method to upload a new document
+        /// </summary>
+        /// <param name="uploadDocumentRequest">Request Model format for Upload functionality</param>
+        /// <param name="LoggerId">MessageId will be used for logging information</param>
+        /// <returns></returns>
+        private UploadDocumentResponse UploadDocument(UploadDocumentRequest uploadDocumentRequest, string LoggerId)
         {
             UploadDocumentResponse uploadDocumentResponse = new UploadDocumentResponse();
             SecureString secureString = null;
             try
             {
-                Log.Info("In UploadDocument method");
-                if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length <= SpoConstants.MaxFileSize)
+                Log.DebugFormat("In UploadDocument method for MessageId - {0}", LoggerId);
+                if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length <= Convert.ToInt32(ConfigurationManager.AppSettings.Get(SpoConstants.MaxFileSize)))
                 {
                     using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                     {
+                        //Get SPO Credentials for authentication
                         secureString = new NetworkCredential("", CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
@@ -57,16 +72,20 @@ namespace DDMS.WebService.SPOActions
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
                         clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
-
-                        if (TryGetFileByServerRelativeUrl(clientContext, uploadDocumentRequest))
+                        //check if file with same name already exists
+                        if (TryGetFileByServerRelativeUrl(clientContext, uploadDocumentRequest, LoggerId))
                         {
                             Random random = new Random();
-                            Log.Info("In UploadDocument method FileName already exists renaming the file");
-                            uploadDocumentRequest.DocumentName = string.Concat(uploadDocumentRequest.DocumentName.Split('.')[0], DateTime.Now.ToString("yyyyMMddhhmmss"), random.Next(1000, 9999), '.', uploadDocumentRequest.DocumentName.Split('.')[1]);
-                            Log.Debug("In UploadDocument method after renaming the file :" + uploadDocumentRequest.DocumentName);
-                        }
+                            Log.DebugFormat("In UploadDocument method FileName already exists renaming the file for MessageId - {0}", LoggerId);
 
+                            //if file exists with same name, rename based on current timestamp
+                            uploadDocumentRequest.DocumentName = string.Concat(System.IO.Path.GetFileNameWithoutExtension(uploadDocumentRequest.DocumentName), DateTime.Now.ToString("yyyyMMddhhmmss"), random.Next(1000, 9999), System.IO.Path.GetExtension(uploadDocumentRequest.DocumentName));
+                            Log.DebugFormat("In UploadDocument method after renaming the file for MessageId - {0} :{1}", LoggerId, uploadDocumentRequest.DocumentName);
+                        }
+                        //get the documentlibrary to upload
                         Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
+
+                        //create file creation information for new upload
                         FileCreationInformation fileCreationInformation = new FileCreationInformation
                         {
                             ContentStream = new System.IO.MemoryStream(uploadDocumentRequest.DocumentContent),
@@ -80,30 +99,38 @@ namespace DDMS.WebService.SPOActions
 
                         if (file.Exists)
                         {
+                            //assign the documentid to response model
                             uploadDocumentResponse.DocumentId = file.UniqueId;
-                            Log.Info("In UploadDocument method - after uploading file to SPO DocumentId :" + uploadDocumentResponse.DocumentId);
-                            if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion))
+                            //assign the versionnumber to response model
+                            uploadDocumentResponse.Version = file.UIVersionLabel;
+                            Log.DebugFormat("In UploadDocument method for MessageId - {0} - after uploading file to SPO DocumentId :{1} Version:{2}", LoggerId, uploadDocumentResponse.DocumentId, uploadDocumentResponse.Version);
+                            if (ValidateMetadata(uploadDocumentRequest))
                             {
-                                uploadDocumentResponse.DocumentId = Guid.Empty;
-                                uploadDocumentResponse.Version = string.Empty;
+                                Log.DebugFormat("In UploadDocument method - validate metadata success, calling SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
+                                
+                                if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion, LoggerId))
+                                {
+                                    uploadDocumentResponse.DocumentId = Guid.Empty;
+                                    uploadDocumentResponse.Version = string.Empty;
+                                }
                             }
                         }
                     }
                 }
                 else
                 {
-                    Log.DebugFormat("In UploadDocument method - {0}", ErrorMessage.MaxFileSizeContentReached);
+                    Log.DebugFormat("In UploadDocument method for MessageId - {0} - {1}", LoggerId, ErrorMessage.MaxFileSizeContentReached);
                     uploadDocumentResponse.ErrorMessage = ErrorMessage.MaxFileSizeContentReached;
                 }
             }
             catch (WebException e) when (e.Status == WebExceptionStatus.NameResolutionFailure)
             {
-                Log.ErrorFormat("Error in UploadDocument method :{0}", e.Message);
+                Log.ErrorFormat("Error in UploadDocument method for MessageId - {0} :{1}", LoggerId, e.Message);
                 uploadDocumentResponse.ErrorMessage = ErrorMessage.RemoteName;
             }
             catch (ServerException ex)
             {
-                Log.ErrorFormat("ServerException in UploadDocument method :{0}", ex.Message);
+                Log.ErrorFormat("ServerException in UploadDocument method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 if (ex.ServerErrorTypeName == ErrorException.SystemIoFileNotFound)
                     uploadDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
                 else
@@ -111,20 +138,27 @@ namespace DDMS.WebService.SPOActions
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("Exception in UploadDocument method :{0}", ex.Message);
+                Log.ErrorFormat("Exception in UploadDocument method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 uploadDocumentResponse.ErrorMessage = ex.Message;
             }
             return uploadDocumentResponse;
         }
-        private UploadDocumentResponse UpdateDocument(UploadDocumentRequest uploadDocumentRequest)
+        /// <summary>
+        /// Method to update an existing document
+        /// </summary>
+        /// <param name="uploadDocumentRequest">Request model for Update document</param>
+        /// <param name="LoggerId">MessageId will be used for logging information</param>
+        /// <returns></returns>
+        private UploadDocumentResponse UpdateDocument(UploadDocumentRequest uploadDocumentRequest, string LoggerId)
         {
             UploadDocumentResponse uploadDocumentResponse = new UploadDocumentResponse();
             SecureString secureString = null;
             try
             {
-                Log.Info("In UpdateDocument method");
+                Log.DebugFormat("In UpdateDocument method for MessageId - {0} DocumentId :{1}", LoggerId, uploadDocumentRequest.DocumentId.ToString());
                 using (ClientContext clientContext = new ClientContext(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)))
                 {
+                    //Get SPO Credentials for authentication
                     secureString = new NetworkCredential("", CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
@@ -134,16 +168,25 @@ namespace DDMS.WebService.SPOActions
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
                     clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
-                    Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
+                    //Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
 
+                    //retreive the existing document based on DocumentId
                     File file = clientContext.Web.GetFileById(uploadDocumentRequest.DocumentId);
                     clientContext.Load(file);
                     clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
-                    if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length <= SpoConstants.MaxFileSize)
+
+                    //fetch the folder path of the file which exists in SPO library
+                    Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + System.IO.Path.GetDirectoryName(file.ServerRelativeUrl));
+                    clientContext.Load(folder);
+                    clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+
+                    if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length <= Convert.ToInt32(ConfigurationManager.AppSettings.Get(SpoConstants.MaxFileSize)))
                     {
-                        if (file.Name.Split('.')[1].ToUpper() == uploadDocumentRequest.DocumentName.Split('.')[1].ToUpper())
+                        //check if the file extension in request is same as the file in SPO library
+                        if (System.IO.Path.GetExtension(file.Name).ToUpper() == System.IO.Path.GetExtension(uploadDocumentRequest.DocumentName).ToUpper())
                         {
-                            if (file.Name.Split('.')[0].ToUpper() != uploadDocumentRequest.DocumentName.Split('.')[0].ToUpper())
+                            Log.DebugFormat("File Extension validation success for MessageId - {0} - Same file extension provided", LoggerId);
+                            if (System.IO.Path.GetFileNameWithoutExtension(file.Name).ToUpper() != System.IO.Path.GetFileNameWithoutExtension(uploadDocumentRequest.DocumentName).ToUpper())
                                 uploadDocumentRequest.DocumentName = file.Name;
                             FileCreationInformation fileCreationInformation = new FileCreationInformation
                             {
@@ -154,17 +197,25 @@ namespace DDMS.WebService.SPOActions
                             file = folder.Files.Add(fileCreationInformation);
                             clientContext.Load(folder);
                             clientContext.Load(file);
+                            //update an existing document
                             clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
-                            Log.Info("In UpdateDocument method after updating the document in SPO");
-                            if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion))
+                            uploadDocumentResponse.DocumentId = file.UniqueId;
+                            uploadDocumentResponse.Version = file.UIVersionLabel;
+                            Log.DebugFormat("In UpdateDocument method after updating the document in SPO for MessageId - {0} DocumentId :{1} Version{2}", LoggerId, uploadDocumentResponse.DocumentId, uploadDocumentResponse.Version);
+                            if (ValidateMetadata(uploadDocumentRequest))
                             {
-                                uploadDocumentResponse.DocumentId = Guid.Empty;
-                                uploadDocumentResponse.Version = string.Empty;
-                                uploadDocumentResponse.ErrorMessage = ErrorMessage.UpDateFailed;
+                                Log.DebugFormat("In UpdateDocument method - validate metadata success, calling SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
+                                if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion, LoggerId))
+                                {
+                                    uploadDocumentResponse.DocumentId = Guid.Empty;
+                                    uploadDocumentResponse.Version = string.Empty;
+                                    uploadDocumentResponse.ErrorMessage = ErrorMessage.UpDateFailed;
+                                }
                             }
                         }
                         else
                         {
+                            //if file extension in request object is different, throw an error
                             uploadDocumentResponse.DocumentId = Guid.Empty;
                             uploadDocumentResponse.Version = string.Empty;
                             uploadDocumentResponse.ErrorMessage = ErrorMessage.DifferentFileExtension;
@@ -174,19 +225,25 @@ namespace DDMS.WebService.SPOActions
                     {
                         if (uploadDocumentRequest.DocumentContent == null || uploadDocumentRequest.DocumentContent.Length == 0)
                         {
-                            Log.DebugFormat("In UploadDocument method - DocumentContent is null or DocumentContent length is zero");
-                            Log.DebugFormat("In UploadDocument method - Update only MetaData");
-                            if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, !SpoConstants.OverRideExistingVersion))
+                            Log.DebugFormat("In UpdateDocument method - DocumentContent is null or DocumentContent length is zero for MessageId - {0}", LoggerId);
+                            Log.DebugFormat("In UpdateDocument method - Update only MetaData for MessageId - {0}", LoggerId);
+                            if (ValidateMetadata(uploadDocumentRequest))
                             {
-                                Log.Debug("In UploadDocument method - Update only MetaData failed :" + uploadDocumentResponse.ErrorMessage);
-                                uploadDocumentResponse.DocumentId = Guid.Empty;
-                                uploadDocumentResponse.Version = string.Empty;
-                                uploadDocumentResponse.ErrorMessage = ErrorMessage.UpDateFailed;
+                                Log.DebugFormat("In UpdateDocument method - validate metadata success, calling SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
+                                if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, !SpoConstants.OverRideExistingVersion, LoggerId))
+                                {
+                                    Log.DebugFormat("In UpdateDocument method for MessageId - {0} - Update only MetaData failed :{1}", LoggerId, uploadDocumentResponse.ErrorMessage);
+                                    uploadDocumentResponse.DocumentId = Guid.Empty;
+                                    uploadDocumentResponse.Version = string.Empty;
+                                    uploadDocumentResponse.ErrorMessage = ErrorMessage.UpDateFailed;
+                                }
                             }
                         }
-                        if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length > SpoConstants.MaxFileSize)
+
+                        //check if filesize in request object is less than permitted size
+                        if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length > Convert.ToInt32(ConfigurationManager.AppSettings.Get(SpoConstants.MaxFileSize)))
                         {
-                            Log.DebugFormat("In UploadDocument method - {0}", ErrorMessage.MaxFileSizeContentReached);
+                            Log.DebugFormat("In UpdateDocument method for MessageId - {0} - {1}", LoggerId, ErrorMessage.MaxFileSizeContentReached);
                             uploadDocumentResponse.ErrorMessage = ErrorMessage.MaxFileSizeContentReached;
                             uploadDocumentResponse.DocumentId = Guid.Empty;
                             uploadDocumentResponse.Version = string.Empty;
@@ -196,12 +253,12 @@ namespace DDMS.WebService.SPOActions
             }
             catch (WebException e) when (e.Status == WebExceptionStatus.NameResolutionFailure)
             {
-                Log.ErrorFormat("WebException in UpdateDocument method :{0}", e.Message);
+                Log.ErrorFormat("WebException in UpdateDocument method for MessageId - {0} :{1}", LoggerId, e.Message);
                 uploadDocumentResponse.ErrorMessage = ErrorMessage.RemoteName;
             }
             catch (ServerException ex)
             {
-                Log.ErrorFormat("ServerException in UpdateDocument method :{0}", ex.Message);
+                Log.ErrorFormat("ServerException in UpdateDocument method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 if (ex.ServerErrorTypeName == ErrorException.SystemIoFileNotFound)
                     uploadDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
                 else
@@ -209,18 +266,19 @@ namespace DDMS.WebService.SPOActions
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("Exception in UpdateDocument method :{0}", ex.Message);
+                Log.ErrorFormat("Exception in UpdateDocument method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 uploadDocumentResponse.ErrorMessage = ex.Message;
             }
             return uploadDocumentResponse;
         }
-        private static bool TryGetFileByServerRelativeUrl(ClientContext clientContext, UploadDocumentRequest uploadDocumentRequest)
+        private static bool TryGetFileByServerRelativeUrl(ClientContext clientContext, UploadDocumentRequest uploadDocumentRequest, string LoggerId)
         {
             bool fileAlreadyExistStatus = false;
             try
             {
-                Log.Info("In TryGetFileByServerRelativeUrl method");
-                File file = clientContext.Web.GetFileByUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder) + "/" + uploadDocumentRequest.DocumentName);
+                Log.DebugFormat("In TryGetFileByServerRelativeUrl method for MessageId - {0}", LoggerId);
+                ResourcePath filePath = ResourcePath.FromDecodedUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPORelativeURL) + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder) + "/" + uploadDocumentRequest.DocumentName);
+                File file = clientContext.Web.GetFileByServerRelativePath(filePath);
                 clientContext.Load(file);
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                 if (file.Exists)
@@ -228,7 +286,7 @@ namespace DDMS.WebService.SPOActions
             }
             catch (ServerException ex)
             {
-                Log.ErrorFormat("ServerException in TryGetFileByServerRelativeUrl method :{0}", ex.Message);
+                Log.ErrorFormat("ServerException in TryGetFileByServerRelativeUrl method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 if (ex.ServerErrorTypeName == ErrorException.SystemIoFileNotFound)
                 {
                     fileAlreadyExistStatus = false;
@@ -238,22 +296,33 @@ namespace DDMS.WebService.SPOActions
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("Exception in TryGetFileByServerRelativeUrl method :{0}", ex.Message);
+                Log.ErrorFormat("Exception in TryGetFileByServerRelativeUrl method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 fileAlreadyExistStatus = false;
             }
+            Log.DebugFormat("Out TryGetFileByServerRelativeUrl method for MessageId - {0} fileAlreadyExistStatus :{1}", LoggerId, fileAlreadyExistStatus);
             return fileAlreadyExistStatus;
         }
-        private bool SaveOrUpdateMetaData(ClientContext clientContext, Folder folder, File file, UploadDocumentRequest uploadDocumentRequest, UploadDocumentResponse uploadDocumentResponse, bool overRideExistingVersion)
+        /// <summary>
+        /// Method to update the metadata
+        /// </summary>
+        /// <param name="clientContext">SPO client context object</param>
+        /// <param name="folder">SPO Document library</param>
+        /// <param name="file">New file uploaded to document library</param>
+        /// <param name="uploadDocumentRequest"> Request model for Upload Document</param>
+        /// <param name="uploadDocumentResponse">Response model for Upload Document</param>
+        /// <param name="overRideExistingVersion">boolean value to override existing version</param>
+        /// <param name="LoggerId">MessageId for logging information</param>
+        /// <returns></returns>
+        private bool SaveOrUpdateMetaData(ClientContext clientContext, Folder folder, File file, UploadDocumentRequest uploadDocumentRequest, UploadDocumentResponse uploadDocumentResponse, bool overRideExistingVersion, string LoggerId)
         {
             bool bReturnvalue = false;
             try
             {
-                Log.Info("In SaveOrUpdateMetaData method");
+                Log.DebugFormat("In SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
                 List objList = clientContext.Web.Lists.GetByTitle(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
+                //fetch the document based on SPO Unique ID
                 ListItem objListItem = objList.GetItemByUniqueId(file.UniqueId);
 
-                if (!string.IsNullOrWhiteSpace(uploadDocumentRequest.DocumentName))
-                    objListItem[SpoConstants.Title] = uploadDocumentRequest.DocumentName;
                 if (!string.IsNullOrWhiteSpace(uploadDocumentRequest.DealerNumber))
                     objListItem[SpoConstants.DealerNumber] = uploadDocumentRequest.DealerNumber;
                 if (!string.IsNullOrWhiteSpace(uploadDocumentRequest.RequestUser))
@@ -268,19 +337,19 @@ namespace DDMS.WebService.SPOActions
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                 uploadDocumentResponse.DocumentId = file.UniqueId;
                 uploadDocumentResponse.Version = file.UIVersionLabel;
-                Log.DebugFormat("In SaveOrUpdateMetaData method DocumentId :{0} Version :{1}", uploadDocumentResponse.DocumentId, uploadDocumentResponse.Version);
+                Log.DebugFormat("In SaveOrUpdateMetaData method for MessageId - {0} DocumentId :{1} Version :{2}", LoggerId, uploadDocumentResponse.DocumentId, uploadDocumentResponse.Version);
                 bReturnvalue = true;
-                Log.Info("Out of SaveOrUpdateMetaData method");
+                Log.DebugFormat("Out of SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
             }
             catch (WebException e) when (e.Status == WebExceptionStatus.NameResolutionFailure)
             {
-                Log.ErrorFormat("WebException in SaveOrUpdateMetaData method :{0}", e.Message);
+                Log.ErrorFormat("WebException in SaveOrUpdateMetaData method for MessageId - {0} :{1}", LoggerId, e.Message);
                 bReturnvalue = false;
                 uploadDocumentResponse.ErrorMessage = ErrorMessage.RemoteName;
             }
             catch (ServerException ex)
             {
-                Log.ErrorFormat("ServerException in SaveOrUpdateMetaData method :{0}", ex.Message);
+                Log.ErrorFormat("ServerException in SaveOrUpdateMetaData method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 bReturnvalue = false;
                 if (ex.ServerErrorTypeName == ErrorException.SystemIoFileNotFound)
                     uploadDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
@@ -293,10 +362,30 @@ namespace DDMS.WebService.SPOActions
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("Exception in SaveOrUpdateMetaData method :{0}", ex.Message);
+                Log.ErrorFormat("Exception in SaveOrUpdateMetaData method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 uploadDocumentResponse.ErrorMessage = ex.Message;
             }
             return bReturnvalue;
+        }
+        /// <summary>
+        /// Method to validate if metadata is passed in request object
+        /// </summary>
+        /// <param name="uploadDocumentRequest">Request model for Upload Document</param>
+        /// <returns></returns>
+        private bool ValidateMetadata(UploadDocumentRequest uploadDocumentRequest)
+        {
+            bool validMetadata = false;
+            try
+            {
+                //checks if metadata is passed in request and returns a boolean value
+                if (!string.IsNullOrEmpty(uploadDocumentRequest.DealerNumber) || !string.IsNullOrEmpty(uploadDocumentRequest.RequestUser))
+                    validMetadata = true;
+            }
+            catch (Exception e)
+            {
+                validMetadata = false;
+            }
+            return validMetadata;
         }
         #endregion
     }

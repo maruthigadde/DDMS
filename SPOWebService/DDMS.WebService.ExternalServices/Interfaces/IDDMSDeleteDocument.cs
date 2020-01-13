@@ -9,6 +9,6 @@ namespace DDMS.WebService.ExternalServices.Interfaces
 {
     public interface IDDMSDeleteDocument
     {
-        DeleteDocumentResponse DDMSDelete(DeleteDocumentRequest deleteDocumentRequest);
+        DeleteDocumentResponse DDMSDelete(DeleteDocumentRequest deleteDocumentRequest, string LoggerId);
     }
 }
