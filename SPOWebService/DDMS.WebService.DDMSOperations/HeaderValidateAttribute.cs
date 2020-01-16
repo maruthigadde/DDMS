@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -106,7 +107,7 @@ namespace DDMS.WebService.DDMSOperations
 
                     if (actionContext.Request.Headers.Contains(HeaderConstants.SiteId) && !string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.SiteId).First()))
                     {
-                        if (actionContext.Request.Headers.GetValues(HeaderConstants.SiteId).First().ToUpper() != HeaderValueConstants.SiteId.ToUpper())
+                        if (actionContext.Request.Headers.GetValues(HeaderConstants.SiteId).First().ToUpper() != (ConfigurationManager.AppSettings.Get(HeaderValueConstants.SiteId)).ToUpper())
                         {
                             keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionSiteIdInvalid);
                             return false;
@@ -115,7 +116,7 @@ namespace DDMS.WebService.DDMSOperations
 
                     if (actionContext.Request.Headers.Contains(HeaderConstants.BusinessId) && !string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.BusinessId).First()))
                     {
-                        if (actionContext.Request.Headers.GetValues(HeaderConstants.BusinessId).First().ToUpper() != HeaderValueConstants.BusinessId.ToUpper())
+                        if (actionContext.Request.Headers.GetValues(HeaderConstants.BusinessId).First().ToUpper() != (ConfigurationManager.AppSettings.Get(HeaderValueConstants.BusinessId)).ToUpper())
                         {
                             keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionBusinessIdInvalid);
                             return false;

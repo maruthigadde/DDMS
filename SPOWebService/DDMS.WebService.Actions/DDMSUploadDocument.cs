@@ -83,7 +83,7 @@ namespace DDMS.WebService.SPOActions
                             Log.DebugFormat("In UploadDocument method after renaming the file for MessageId - {0} :{1}", LoggerId, uploadDocumentRequest.DocumentName);
                         }
                         //get the documentlibrary to upload
-                        Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
+                        Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(HeaderValueConstants.SiteId));
 
                         //create file creation information for new upload
                         FileCreationInformation fileCreationInformation = new FileCreationInformation
@@ -277,7 +277,7 @@ namespace DDMS.WebService.SPOActions
             try
             {
                 Log.DebugFormat("In TryGetFileByServerRelativeUrl method for MessageId - {0}", LoggerId);
-                ResourcePath filePath = ResourcePath.FromDecodedUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPORelativeURL) + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder) + "/" + uploadDocumentRequest.DocumentName);
+                ResourcePath filePath = ResourcePath.FromDecodedUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPORelativeURL) + ConfigurationManager.AppSettings.Get(HeaderValueConstants.SiteId) + "/" + uploadDocumentRequest.DocumentName);
                 File file = clientContext.Web.GetFileByServerRelativePath(filePath);
                 clientContext.Load(file);
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
@@ -319,7 +319,7 @@ namespace DDMS.WebService.SPOActions
             try
             {
                 Log.DebugFormat("In SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
-                List objList = clientContext.Web.Lists.GetByTitle(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
+                List objList = clientContext.Web.Lists.GetByTitle(ConfigurationManager.AppSettings.Get(HeaderValueConstants.SiteId));
                 //fetch the document based on SPO Unique ID
                 ListItem objListItem = objList.GetItemByUniqueId(file.UniqueId);
 

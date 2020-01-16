@@ -72,8 +72,8 @@ namespace DDMS.WebService.Constants
     [ExcludeFromCodeCoverage]
     public static class HeaderValueConstants
     {
-        public const string SiteId = "DDMS";
-        public const string BusinessId = "DDMS Documents";
+        public const string SiteId = "SiteId";
+        public const string BusinessId = "BusinessId";
         public const string Success = "Success";
         public const string Failed = "Failed";
     }
