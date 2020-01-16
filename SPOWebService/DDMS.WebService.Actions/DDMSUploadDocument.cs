@@ -176,7 +176,9 @@ namespace DDMS.WebService.SPOActions
                     clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
 
                     //fetch the folder path of the file which exists in SPO library
-                    Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + System.IO.Path.GetDirectoryName(file.ServerRelativeUrl));
+                    Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)
+                                                                                   + "/" 
+                                                                                   + System.IO.Path.GetDirectoryName(file.ServerRelativeUrl));
                     clientContext.Load(folder);
                     clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
 
@@ -209,7 +211,7 @@ namespace DDMS.WebService.SPOActions
                                 {
                                     uploadDocumentResponse.DocumentId = Guid.Empty;
                                     uploadDocumentResponse.Version = string.Empty;
-                                    uploadDocumentResponse.ErrorMessage = ErrorMessage.UpDateFailed;
+                                    uploadDocumentResponse.ErrorMessage = ErrorMessage.UpdateFailed;
                                 }
                             }
                         }
@@ -235,7 +237,7 @@ namespace DDMS.WebService.SPOActions
                                     Log.DebugFormat("In UpdateDocument method for MessageId - {0} - Update only MetaData failed :{1}", LoggerId, uploadDocumentResponse.ErrorMessage);
                                     uploadDocumentResponse.DocumentId = Guid.Empty;
                                     uploadDocumentResponse.Version = string.Empty;
-                                    uploadDocumentResponse.ErrorMessage = ErrorMessage.UpDateFailed;
+                                    uploadDocumentResponse.ErrorMessage = ErrorMessage.UpdateFailed;
                                 }
                             }
                         }

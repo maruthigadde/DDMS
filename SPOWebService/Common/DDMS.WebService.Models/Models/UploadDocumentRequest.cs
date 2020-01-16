@@ -33,7 +33,7 @@ namespace DDMS.WebService.Models
             }
         }
         [Required(AllowEmptyStrings = false, ErrorMessage = "DocumentName is Missing or DocumentName is invalid")]
-        [RegularExpression(@"^[a-zA-Z0-9_\~\!\@\#\$\%\^\&\(\)\-\`\+\=\{\[\}\]\;\'\ \,]{1,400}\.(doc|ppt|xls|docx|pptx|xlsx|pdf|zip|jpg|tif|gif|DOC|PPT|XLS|PDF|ZIP|JPG|TIF|GIF|DOCX|PPTX|XLSX)$", ErrorMessage = @"Document name should be of max 400 characters and special-characters like '/*\<|>?""' are not allowed")]
+        [RegularExpression(@"^[a-zA-Z0-9_\~\!\@\#\$\%\^\&\(\)\-\`\+\=\{\[\}\]\;\'\.\ \,]{1,400}\.(doc|ppt|xls|docx|pptx|xlsx|pdf|zip|jpg|tif|gif|DOC|PPT|XLS|PDF|ZIP|JPG|TIF|GIF|DOCX|PPTX|XLSX)$", ErrorMessage = @"Document name should be of max 400 characters and special-characters like '/*\<|>?""' are not allowed")]
         public string DocumentName
         {
             get
