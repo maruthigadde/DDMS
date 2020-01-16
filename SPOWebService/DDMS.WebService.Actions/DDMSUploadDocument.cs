@@ -28,7 +28,7 @@ namespace DDMS.WebService.SPOActions
             {
                 Log.DebugFormat("In DDMSUpload method for MessageId - {0}", LoggerId);
                 if (uploadDocumentRequest.DocumentId != Guid.Empty)
-                   //if documentid is passed in request, an existing document will be updated
+                    //if documentid is passed in request, an existing document will be updated
                     uploadDocumentResponse = UpdateDocument(uploadDocumentRequest, LoggerId);
                 else
                     //if documentid is empty or not passed in request, a new document is uploaded
@@ -94,7 +94,12 @@ namespace DDMS.WebService.SPOActions
                         };
                         File file = folder.Files.Add(fileCreationInformation);
                         clientContext.Load(folder);
-                        clientContext.Load(file);
+                        clientContext.Load(file, i => i.Name,
+                                                 i => i.UniqueId,
+                                                 i => i.UIVersionLabel,
+                                                 i => i.ServerRelativeUrl,
+                                                 i => i.ListId,
+                                                 i => i.Exists);
                         clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
 
                         if (file.Exists)
@@ -107,8 +112,8 @@ namespace DDMS.WebService.SPOActions
                             if (ValidateMetadata(uploadDocumentRequest))
                             {
                                 Log.DebugFormat("In UploadDocument method - validate metadata success, calling SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
-                                
-                                if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion, LoggerId))
+
+                                if (!SaveOrUpdateMetaData(clientContext, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion, LoggerId))
                                 {
                                     uploadDocumentResponse.DocumentId = Guid.Empty;
                                     uploadDocumentResponse.Version = string.Empty;
@@ -168,16 +173,20 @@ namespace DDMS.WebService.SPOActions
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
 
                     clientContext.Credentials = new SharePointOnlineCredentials(username, secureString);
-                    //Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL) + "/" + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
 
                     //retreive the existing document based on DocumentId
                     File file = clientContext.Web.GetFileById(uploadDocumentRequest.DocumentId);
-                    clientContext.Load(file);
+                    clientContext.Load(file, i => i.Name,
+                                             i => i.UniqueId,
+                                             i => i.UIVersionLabel,
+                                             i => i.ServerRelativeUrl,
+                                             i => i.ListId,
+                                             i => i.Exists);
                     clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
 
                     //fetch the folder path of the file which exists in SPO library
                     Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)
-                                                                                   + "/" 
+                                                                                   + "/"
                                                                                    + System.IO.Path.GetDirectoryName(file.ServerRelativeUrl));
                     clientContext.Load(folder);
                     clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
@@ -198,7 +207,12 @@ namespace DDMS.WebService.SPOActions
                             };
                             file = folder.Files.Add(fileCreationInformation);
                             clientContext.Load(folder);
-                            clientContext.Load(file);
+                            clientContext.Load(file, i => i.Name,
+                                                     i => i.UniqueId,
+                                                     i => i.UIVersionLabel,
+                                                     i => i.ServerRelativeUrl,
+                                                     i => i.ListId,
+                                                     i => i.Exists);
                             //update an existing document
                             clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                             uploadDocumentResponse.DocumentId = file.UniqueId;
@@ -207,7 +221,7 @@ namespace DDMS.WebService.SPOActions
                             if (ValidateMetadata(uploadDocumentRequest))
                             {
                                 Log.DebugFormat("In UpdateDocument method - validate metadata success, calling SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
-                                if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion, LoggerId))
+                                if (!SaveOrUpdateMetaData(clientContext, file, uploadDocumentRequest, uploadDocumentResponse, SpoConstants.OverRideExistingVersion, LoggerId))
                                 {
                                     uploadDocumentResponse.DocumentId = Guid.Empty;
                                     uploadDocumentResponse.Version = string.Empty;
@@ -232,7 +246,7 @@ namespace DDMS.WebService.SPOActions
                             if (ValidateMetadata(uploadDocumentRequest))
                             {
                                 Log.DebugFormat("In UpdateDocument method - validate metadata success, calling SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
-                                if (!SaveOrUpdateMetaData(clientContext, folder, file, uploadDocumentRequest, uploadDocumentResponse, !SpoConstants.OverRideExistingVersion, LoggerId))
+                                if (!SaveOrUpdateMetaData(clientContext, file, uploadDocumentRequest, uploadDocumentResponse, !SpoConstants.OverRideExistingVersion, LoggerId))
                                 {
                                     Log.DebugFormat("In UpdateDocument method for MessageId - {0} - Update only MetaData failed :{1}", LoggerId, uploadDocumentResponse.ErrorMessage);
                                     uploadDocumentResponse.DocumentId = Guid.Empty;
@@ -281,7 +295,12 @@ namespace DDMS.WebService.SPOActions
                 Log.DebugFormat("In TryGetFileByServerRelativeUrl method for MessageId - {0}", LoggerId);
                 ResourcePath filePath = ResourcePath.FromDecodedUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPORelativeURL) + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder) + "/" + uploadDocumentRequest.DocumentName);
                 File file = clientContext.Web.GetFileByServerRelativePath(filePath);
-                clientContext.Load(file);
+                clientContext.Load(file, i => i.Name,
+                                         i => i.UniqueId,
+                                         i => i.UIVersionLabel,
+                                         i => i.ServerRelativeUrl,
+                                         i => i.ListId,
+                                         i => i.Exists);
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                 if (file.Exists)
                     fileAlreadyExistStatus = true;
@@ -315,13 +334,13 @@ namespace DDMS.WebService.SPOActions
         /// <param name="overRideExistingVersion">boolean value to override existing version</param>
         /// <param name="LoggerId">MessageId for logging information</param>
         /// <returns></returns>
-        private bool SaveOrUpdateMetaData(ClientContext clientContext, Folder folder, File file, UploadDocumentRequest uploadDocumentRequest, UploadDocumentResponse uploadDocumentResponse, bool overRideExistingVersion, string LoggerId)
+        private bool SaveOrUpdateMetaData(ClientContext clientContext, File file, UploadDocumentRequest uploadDocumentRequest, UploadDocumentResponse uploadDocumentResponse, bool overRideExistingVersion, string LoggerId)
         {
             bool bReturnvalue = false;
             try
             {
                 Log.DebugFormat("In SaveOrUpdateMetaData method for MessageId - {0}", LoggerId);
-                List objList = clientContext.Web.Lists.GetByTitle(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder));
+                List objList = clientContext.Web.Lists.GetById(file.ListId);
                 //fetch the document based on SPO Unique ID
                 ListItem objListItem = objList.GetItemByUniqueId(file.UniqueId);
 
@@ -335,7 +354,12 @@ namespace DDMS.WebService.SPOActions
                 else
                     objListItem.Update();
 
-                clientContext.Load(file);
+                clientContext.Load(file, i => i.Name,
+                                         i => i.UniqueId,
+                                         i => i.UIVersionLabel,
+                                         i => i.ServerRelativeUrl,
+                                         i => i.ListId,
+                                         i => i.Exists);
                 clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
                 uploadDocumentResponse.DocumentId = file.UniqueId;
                 uploadDocumentResponse.Version = file.UIVersionLabel;
