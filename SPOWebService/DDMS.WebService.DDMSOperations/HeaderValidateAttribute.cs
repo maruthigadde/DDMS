@@ -11,9 +11,10 @@ namespace DDMS.WebService.DDMSOperations
 {
     public class HeaderValidateAttribute : AuthorizationFilterAttribute
     {
+        //  Calls when DDMS API requests Headers authorization.
         public override void OnAuthorization(HttpActionContext actionContext)
         {
-            //validate headers
+            //Validate headers passed in request object
             Dictionary<string, dynamic> headerKeyValuePairs = new Dictionary<string, dynamic>();
             if (actionContext != null && actionContext.Request != null && actionContext.Request.Headers != null)
             {
@@ -54,43 +55,49 @@ namespace DDMS.WebService.DDMSOperations
         {
             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
-
+        /// <summary>
+        /// Method to validate headers parameters
+        /// </summary>
+        /// <param name="actionContext"> Contains information of the executing action</param>
+        /// <param name="keyValuePairs">Dictionary to store header parameters</param>
+        /// <returns></returns>
         private bool ValidateHeader(HttpActionContext actionContext, ref Dictionary<string, dynamic> keyValuePairs)
         {
             Guid messageId = new Guid();
             DateTime collectedTimeStamp = new DateTime();
             try
             {
-                //If MessageId is not passed or empty
+                //Check if MessageId is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.MessageId) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.MessageId).First()))
                 {
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionMessageIdRequired);
                     return false;
                 }
-                //If SiteId is not passed or empty
+                //Check if SiteId is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.SiteId) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.SiteId).First()))
                 {
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionSiteIdRequired);
                     return false;
                 }
-                //If BusinessId is not passed or empty
+                //Check if BusinessId is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.BusinessId) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.BusinessId).First()))
                 {
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionBusinessIdRequired);
                     return false;
                 }
-                // If CollectedTimeStamp is not passed or empty
+                // Check if CollectedTimeStamp is not passed or empty
                 if (!actionContext.Request.Headers.Contains(HeaderConstants.CollectedTimeStamp) || string.IsNullOrEmpty(actionContext.Request.Headers.GetValues(HeaderConstants.CollectedTimeStamp).First()))
                 {
                     keyValuePairs.Add(HeaderConstants.ErrorDescription, HeaderErrorConstants.ErrorDescriptionCollectedTimeStampRequired);
                     return false;
                 }
 
-                /*check header values as per Honda Requirements
+                /*Check header values as per Honda Requirements
                 MessageId = GUID format
                 SiteId= DDMS
                 BusinessId = DDMS Documents
                 TimeStamp = Datetime
+                and add to the Dictionary keyvaluepairs
                 */
                 if (actionContext.Request.Headers.Contains(HeaderConstants.MessageId) && actionContext.Request.Headers.Contains(HeaderConstants.SiteId) && actionContext.Request.Headers.Contains(HeaderConstants.BusinessId) && actionContext.Request.Headers.Contains(HeaderConstants.CollectedTimeStamp))
                 {

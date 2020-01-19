@@ -9,8 +9,16 @@ namespace SPOService.Helper
     public class CommonHelper
     {
         public static readonly int KeyBitSize = 256;
+        /// <summary>
+        /// Method to decrypt the encrypted Configuration parameters
+        /// </summary>
+        /// <param name="Encryptedstring">Encrypted SPO User name or SPO Password</param>
+        /// <param name="Key">Encrypted Key</param>
+        /// <param name="Iv">Encrypted Iv</param>
+        /// <returns>Decrypted string</returns>
         public static string Decrypt(string Encryptedstring, string Key, string Iv)
         {
+            //Algorithm used for decryption
             AesManaged tdes = new AesManaged();
             byte[] bytestoDecrypt = null;
             try

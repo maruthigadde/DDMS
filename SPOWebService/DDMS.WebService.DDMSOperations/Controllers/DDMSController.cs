@@ -31,17 +31,17 @@ namespace DDMS.WebService.DDMSOperations.Controllers
         }
 
         /// <summary>
-        /// DDMS API GET Method to Search a document
+        /// DDMS API GET method to search a document
         /// </summary>
-        /// <param name="documentId"> Mandatory attribute for Search by Version or Search metadata</param>
-        /// <param name="version"> to get specific content version number should be passed</param>
+        /// <param name="documentId"> Mandatory attribute for search</param>
+        /// <param name="version"> Version number required to get specific version content</param>
         /// <returns></returns>
         [HttpGet, Route("~/api/DDMS/{DocumentId:Guid}/"), Route("~/api/DDMS/{DocumentId:Guid}/{Version:decimal}")]
         public IHttpActionResult SearchDocument(Guid documentId, string version = null)
         {
             Guid messageId;
             Dictionary<string, dynamic> keyValuePairs;
-            //fetch the Header parameters from request context
+            //Retrieve the header parameters from request object
             RetrieveHeaders(out keyValuePairs, out messageId);
             SearchDocumentRequest searchDocumentRequest = new SearchDocumentRequest();
             SearchDocumentResponse searchDocumentResponse = new SearchDocumentResponse();
@@ -53,19 +53,20 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                 
                 if (searchDocumentRequest.DocumentId != Guid.Empty)
                 {
-                    //if documentid is not empty and version number is not passed - retrieves the document metadata
+                    //If documentid is not empty and version number is not passed retrieve the document metadata
                     if ((string.IsNullOrEmpty(searchDocumentRequest.Version) || string.IsNullOrWhiteSpace(searchDocumentRequest.Version)))
                     {
+                        //Create a new SearchDocumentAllMetadataVersions model object 
                         SearchDocumentAllMetaDataVersions searchDocumentAllMetaDataVersions = new SearchDocumentAllMetaDataVersions();
                         try
                         {
                             Log.DebugFormat("In api/SearchDocument, before calling DDMSSearchAllOldVersions method for MessageId - {0} Document ID :{1}", messageId.ToString(), searchDocumentRequest.DocumentId.ToString());
-                            //method to retrieve the document metadata, messageid passed in searchrequest
+                            //To fetch document metadata for all versions
                             searchDocumentAllMetaDataVersions = ddmsSearchDocument.DDMSSearchAllOldVersions(searchDocumentRequest, messageId.ToString());
                             Log.DebugFormat("In api/SearchDocument, after calling DDMSSearchAllOldVersions method for MessageId - {0} Document ID :{1}", messageId.ToString(), searchDocumentRequest.DocumentId.ToString());
                             if (string.IsNullOrEmpty(searchDocumentAllMetaDataVersions.ErrorMessage))
                             {
-                                //adding headers to response message as keyvaluepair
+                                //Add headers to response message
                                 keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.OK);
                                 keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Success);
                                 foreach (var field in keyValuePairs)
@@ -76,7 +77,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                                 return Content(HttpStatusCode.OK, searchDocumentAllMetaDataVersions);
                             }
 
-                            //file based on documentid could not be retrieved
+                            //Search based on documentid is not successful - file not found
                             if (searchDocumentAllMetaDataVersions.ErrorMessage == ErrorMessage.FileNotFound)
                             {
                                 
@@ -102,7 +103,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                     try
                     {
                         Log.DebugFormat("In api/SearchDocument, before calling DDMSSearch method for MessageId - {0} - Document ID :{1} Version :{2}", messageId.ToString(), searchDocumentRequest.DocumentId.ToString(), searchDocumentRequest.Version);
-                        //search for the document content based on documentid and version
+                        //Fetch the document based on documentid and version number
                         searchDocumentResponse = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, messageId.ToString());
                         Log.DebugFormat("In api/SearchDocument, after calling DDMSSearch method for MessageId - {0} - Document ID :{1} Version :{2}", messageId.ToString(), searchDocumentRequest.DocumentId.ToString(), searchDocumentRequest.Version);
 
@@ -117,7 +118,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                             }
                             return Content(HttpStatusCode.OK, searchDocumentResponse);
                         }
-
+                        //Add error response file not found 
                         if (searchDocumentResponse.ErrorMessage == ErrorMessage.FileNotFound)
                         {
                             AddErrorResponseHeaders(keyValuePairs, (int)HttpStatusCode.NotFound, ErrorMessage.FileNotFound);
@@ -155,7 +156,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
         /// <summary>
         /// DDMS API POST method to upload a document
         /// </summary>
-        /// <param name="uploadDocumentRequest">byte[] content will be passed for Upload/Update</param>
+        /// <param name="uploadDocumentRequest">byte[] content passed for Upload/Update</param>
         /// <returns>DocumentId & Version number for successful upload</returns>
 
         [HttpPost, Route("~/api/DDMS/"), ModelStateValidation]
@@ -163,13 +164,13 @@ namespace DDMS.WebService.DDMSOperations.Controllers
         {
             Guid messageId;
             Dictionary<string, dynamic> keyValuePairs;
-            //to fetch the Header parameters from request context
+            //Retrieve the header parameters from request object
             RetrieveHeaders(out keyValuePairs, out messageId);
             UploadDocumentResponse uploadDocumentResponse = new UploadDocumentResponse();
             try
             {
                 Log.DebugFormat("In api/UploadDocument, before calling DDMSUpload method for MessageId - {0}", messageId.ToString());
-                //upload the document to SPO library, messageid passed in upload request
+                // Upload or update the document to SPO library
                 uploadDocumentResponse = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, messageId.ToString());
                 Log.DebugFormat("In api/UploadDocument, after calling DDMSUpload method for MessageId - {0}", messageId.ToString());
                 if (string.IsNullOrEmpty(uploadDocumentResponse.ErrorMessage))
@@ -183,7 +184,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                     }
                     return Content(HttpStatusCode.OK, uploadDocumentResponse);
                 }
-
+                //If file is not found during update
                 if (uploadDocumentResponse.ErrorMessage == ErrorMessage.FileNotFound)
                 {
                     AddErrorResponseHeaders(keyValuePairs, (int)HttpStatusCode.NotFound, ErrorMessage.FileNotFound);
@@ -207,31 +208,33 @@ namespace DDMS.WebService.DDMSOperations.Controllers
         /// <summary>
         /// DDMS API DELTE Method to Search a document
         /// </summary>
-        /// <param name="documentId">DocumentId is mandatory for deleting entire or specific version</param>
-        /// <param name="version">to delete specific version, version number is passed</param>
+        /// <param name="documentId">Mandatory attribute for Delete</param>
+        /// <param name="version">Specific version to delete</param>
         /// <returns></returns>
         [HttpDelete, Route("~/api/DDMS/{DocumentId:Guid}/"), Route("~/api/DDMS/{DocumentId:Guid}/{Version:decimal}")]
         public IHttpActionResult DeleteDocument(Guid documentId, string version = null)
         {
             Guid messageId;
             Dictionary<string, dynamic> keyValuePairs;
-            //to fetch the Header parameters from request context
+            //Retrieve the header parameters from request object
             RetrieveHeaders(out keyValuePairs, out messageId);
             DeleteDocumentRequest deleteDocumentRequest = new DeleteDocumentRequest();
             DeleteDocumentResponse deleteDocumentResponse = new DeleteDocumentResponse();
             try
             {
                 Log.DebugFormat("In api/DeleteDocument method for MessageId - {0}", messageId.ToString());
-
+                //Assign the documentid to request model
                 deleteDocumentRequest.DocumentId = documentId;
+                //Assign the version number to request model
                 deleteDocumentRequest.Version = version;
                 Log.DebugFormat("In api/DeleteDocument for MessageId - {0} before calling DDMSDelete DocumentId :{1}", messageId.ToString(), deleteDocumentRequest.DocumentId.ToString());
+                //Call Delete method
                 deleteDocumentResponse = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, messageId.ToString());
                 Log.DebugFormat("In api/DeleteDocument for MessageId - {0} after calling DDMSDelete DocumentId :{1}", messageId.ToString(), deleteDocumentRequest.DocumentId.ToString());
 
                 if (string.IsNullOrEmpty(deleteDocumentResponse.ErrorMessage))
                 {
-                    //add response headers
+                    //Add response headers
                     keyValuePairs.Add(HeaderConstants.ErrorCode, (int)HttpStatusCode.OK);
                     keyValuePairs.Add(HeaderConstants.Status, HeaderValueConstants.Success);
                     foreach (var field in keyValuePairs)
@@ -241,7 +244,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
                     }
                     return Content(HttpStatusCode.OK, deleteDocumentResponse);
                 }
-
+                //If file is not found based on documentId
                 if (deleteDocumentResponse.ErrorMessage == ErrorMessage.FileNotFound)
                 {
                     AddErrorResponseHeaders(keyValuePairs, (int)HttpStatusCode.NotFound, ErrorMessage.FileNotFound);
@@ -262,7 +265,7 @@ namespace DDMS.WebService.DDMSOperations.Controllers
             }
         }
         /// <summary>
-        /// Method to retreive the headers from Request object
+        /// Method to retrieve the headers from Request object
         /// </summary>
         /// <param name="keyValuePairs">Dictionary to store the headers</param>
         /// <param name="messageId">Unique Id (GUID) passed in each request</param>

@@ -18,20 +18,7 @@ namespace DDMS.WebService.Constants
         public const string SPORelativeURL = "SPORelativeURL";
     }
 
-    [ExcludeFromCodeCoverage]
-    public static class LoggerConfigurationConstants
-    {
-        public const string LogDirectory = "LogDirectory";
-        public const string LogPath = "LogPath";
-        public const string LogLevel = "LogLevel";
-        public const string ConversionPattern = "%date [%thread] %-5level %logger - %message%newline";
-        public const string Info = "INFO";
-        public const string Debug = "DEBUG";
-        public const string Error = "ERROR";
-        public const string Off = "OFF";
-        public const string DateTimeFormat = "dd-MM-yyyy";
-        public const string FileExtension = ".txt";
-    }
+    
 
     [ExcludeFromCodeCoverage]
     public static class SpoConstants

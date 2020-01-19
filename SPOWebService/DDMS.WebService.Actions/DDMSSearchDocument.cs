@@ -15,6 +15,7 @@ namespace DDMS.WebService.SPOActions
 {
     public class DDMSSearchDocument : IDDMSSearchDocument
     {
+        //Get the logger for the DDMSSearchDocument type specified
         private static readonly ILog Log = log4net.LogManager.GetLogger(typeof(DDMSSearchDocument));
 
         #region Public Member Functions
@@ -39,7 +40,7 @@ namespace DDMS.WebService.SPOActions
                         secureString = new NetworkCredential("", CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPassword),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
-
+                        //Decrypt the user name and password information
                         String username = CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                     ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
@@ -87,7 +88,7 @@ namespace DDMS.WebService.SPOActions
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordKey),
                                ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOPasswordIv))).SecurePassword;
 
-                    //Decrypt the username and password information
+                    //Decrypt the user name and password information
                     String username = CommonHelper.Decrypt(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserName),
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameKey),
                                 ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOUserNameIv));
@@ -171,12 +172,14 @@ namespace DDMS.WebService.SPOActions
             try
             {
                 Log.DebugFormat("In SearchDocument method before calling SearchDocumentCurrentVersion for MessageId - {0}", LoggerId);
-                //get the document based on specific version, if it is current version
+                //Check if version passed in request is latest published version
                 searchDocumentResponse = SearchDocumentCurrentVersion(clientContext, searchDocumentRequest, LoggerId);
                 Log.DebugFormat("In SearchDocument method after calling SearchDocumentCurrentVersion for MessageId - {0}", LoggerId);
                 if (string.IsNullOrEmpty(searchDocumentResponse.ErrorMessage))
                 {
+                    //Get the version in SPO format from request
                     requestedVersion = GetVersionNumber(searchDocumentRequest.Version, LoggerId);
+                    //Get the version in SPO format from latest published document
                     currentResponseVersion = GetVersionNumber(searchDocumentResponse.Version, LoggerId);
 
                     if (requestedVersion <= currentResponseVersion)
@@ -184,6 +187,7 @@ namespace DDMS.WebService.SPOActions
                         Log.DebugFormat("Before calling SearchDocumentByVersion method - requested version is less than major version for MessageId - {0}", LoggerId);
                         //if the version passed in request is not the latest published version
                         if (requestedVersion != currentResponseVersion)
+                            //Get the previous version document content
                             searchDocumentResponse = SearchDocumentByVersion(clientContext, searchDocumentRequest, requestedVersion, LoggerId);
                     }
                     else
@@ -202,10 +206,10 @@ namespace DDMS.WebService.SPOActions
             return searchDocumentResponse;
         }
         /// <summary>
-        /// Method to retreive the document by any specific version
+        /// Method to retrieve the old version document content
         /// </summary>
         /// <param name="clientContext">SPO Client Context</param>
-        /// <param name="searchDocumentRequest">Request model for Search operation</param>
+        /// <param name="searchDocumentRequest">Request model for search operation</param>
         /// <param name="requestedVersion">Specific version number to be fetched from SPO</param>
         /// <param name="LoggerId">Message Id used for logging information</param>
         /// <returns></returns>
@@ -215,15 +219,15 @@ namespace DDMS.WebService.SPOActions
             try
             {
                 Log.DebugFormat("In SearchDocumentByVersion method for MessageId - {0}", LoggerId);
-                //retrieve file based on DocumentId
+                //Retrieve file based on DocumentId
                 Microsoft.SharePoint.Client.File file = clientContext.Web.GetFileById(searchDocumentRequest.DocumentId);
-                //load list item version to fetch the previous version
+                //Load list item version to fetch the previous version metadata
                 ListItemVersion listItemVersions = file.ListItemAllFields.Versions.GetById(requestedVersion);
-                //get the content of specific file
+                //Get the content of specific file version
                 FileVersion fileVersions = file.Versions.GetById(requestedVersion);
                 ClientResult<Stream> clientResult = fileVersions.OpenBinaryStream();
                 clientContext.Load(file);
-                //load specific metadata of the file
+                //Load specific metadata of the file
                 clientContext.Load(listItemVersions, item => item[SpoConstants.Name],
                                                      item => item[SpoConstants.DealerNumber],
                                                      item => item[SpoConstants.RequestUser],
@@ -237,6 +241,7 @@ namespace DDMS.WebService.SPOActions
                     if (clientResult != null)
                     {
                         clientResult.Value.CopyTo(mStream);
+                        //Read the file content and assign to response model
                         searchDocumentResponse.DocumentContent = mStream.ToArray();
 
                         foreach (var item in listItemVersions.FieldValues)
@@ -276,7 +281,7 @@ namespace DDMS.WebService.SPOActions
 
         }
         /// <summary>
-        /// Method to retrieve document if it is current version
+        /// Method to retrieve document if it is latest published version
         /// </summary>
         /// <param name="clientContext">SPO Client Context</param>
         /// <param name="searchDocumentRequest">Request model for Search Operation</param>
@@ -288,12 +293,12 @@ namespace DDMS.WebService.SPOActions
             try
             {
                 Log.DebugFormat("In SearchDocumentCurrentVersion method for MessageId - {0}", LoggerId);
-                //retrieve file based on document id
+                //Retrieve file based on documentid
                 Microsoft.SharePoint.Client.File file = clientContext.Web.GetFileById(searchDocumentRequest.DocumentId);
-                //fetch the list item fields
+                //Fetch the list item fields
                 ListItem oListItem = file.ListItemAllFields;
                 clientContext.Load(file);
-                //load the specific metadata of the file
+                //Load the specific metadata of the file
                 clientContext.Load(oListItem, item => item[SpoConstants.Name],
                                              item => item[SpoConstants.DealerNumber],
                                              item => item[SpoConstants.RequestUser],
@@ -306,10 +311,11 @@ namespace DDMS.WebService.SPOActions
                     if (clientResult != null)
                     {
                         clientResult.Value.CopyTo(mStream);
-                        //read the file content and assign to response model
+                        //Read the file content and assign to response model
                         searchDocumentResponse.DocumentContent = mStream.ToArray();
                         searchDocumentResponse.DocumentName = file.Name.ToString();
 
+                        //Add file metadata in search response
                         foreach (var item in oListItem.FieldValues)
                         {
                             if (item.Key == SpoConstants.Name && item.Value != null)
@@ -346,6 +352,12 @@ namespace DDMS.WebService.SPOActions
             return searchDocumentResponse;
 
         }
+        /// <summary>
+        /// Method to convert version number into SPO format
+        /// </summary>
+        /// <param name="version">Version to convert</param>
+        /// <param name="LoggerId">MessageId used for logging information</param>
+        /// <returns></returns>
         private int GetVersionNumber(string version, string LoggerId)
         {
             string[] versions = null;
