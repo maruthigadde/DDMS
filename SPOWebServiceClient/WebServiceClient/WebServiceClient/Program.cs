@@ -5,6 +5,8 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using WebServiceClient.Models;
 
@@ -135,6 +137,7 @@ namespace WebServiceClient
                 httpWebRequest.ContentType = "application/json";
                 httpWebRequest.Method = "POST";
                 httpWebRequest.Timeout = 180000;
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(AcceptAllCertificates);
                 string sMessage = JsonConvert.SerializeObject(uploadRequest);
                 using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
                 {
@@ -149,7 +152,7 @@ namespace WebServiceClient
 
                 myStreamReader.Close();
                 responseStream.Close();
-                //Deserialize response content
+                //De serialize response content
                 var response = JsonConvert.DeserializeObject(pageContent);
                 Console.WriteLine("StatusCode :" + httpWebResponse.StatusCode);
                 Console.WriteLine("Response :" + response);
@@ -173,6 +176,11 @@ namespace WebServiceClient
             if (input.ToUpper() == "SEARCH" || input.ToUpper() == "UPLOAD" || input.ToUpper() == "DELETE")
                 DDMSAPI(input);
 
+        }
+
+        private static bool AcceptAllCertificates(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
 
         private static void SearchDocument(Guid guid, string version)
@@ -201,6 +209,7 @@ namespace WebServiceClient
                 httpWebRequest.ContentType = "application/json";
                 httpWebRequest.Method = "GET";
                 httpWebRequest.Timeout = 180000;
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(AcceptAllCertificates);
 
                 HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
                 Stream responseStream = httpWebResponse.GetResponseStream();
@@ -269,6 +278,7 @@ namespace WebServiceClient
                 httpWebRequest.ContentType = "application/json";
                 httpWebRequest.Method = "DELETE";
                 httpWebRequest.Timeout = 180000;
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(AcceptAllCertificates);
 
                 HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
                 Stream responseStream = httpWebResponse.GetResponseStream();

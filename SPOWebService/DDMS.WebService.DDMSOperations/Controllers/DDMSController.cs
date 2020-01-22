@@ -4,6 +4,7 @@ using DDMS.WebService.Models;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -14,7 +15,7 @@ using System.Web.Http;
 namespace DDMS.WebService.DDMSOperations.Controllers
 {
     [ExcludeFromCodeCoverage]
-    //[Authorize(Roles = "DDMS")]
+    [Authorization]
     [HeaderValidate]
     public class DDMSController : ApiController
     {
@@ -164,11 +165,15 @@ namespace DDMS.WebService.DDMSOperations.Controllers
         {
             Guid messageId;
             Dictionary<string, dynamic> keyValuePairs;
+            
+           
             //Retrieve the header parameters from request object
             RetrieveHeaders(out keyValuePairs, out messageId);
             UploadDocumentResponse uploadDocumentResponse = new UploadDocumentResponse();
             try
             {
+               
+
                 Log.DebugFormat("In api/UploadDocument, before calling DDMSUpload method for MessageId - {0}", messageId.ToString());
                 // Upload or update the document to SPO library
                 uploadDocumentResponse = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, messageId.ToString());
