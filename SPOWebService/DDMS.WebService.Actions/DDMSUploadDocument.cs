@@ -316,7 +316,10 @@ namespace DDMS.WebService.SPOActions
             {
                 Log.DebugFormat("In TryGetFileByServerRelativeUrl method for MessageId - {0}", LoggerId);
                 //To ensure special characters in file name are decoded while fetching a file from SPO example: #,$,(
-                ResourcePath filePath = ResourcePath.FromDecodedUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPORelativeURL) + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder) + "/" + uploadDocumentRequest.DocumentName);
+                ResourcePath filePath = ResourcePath.FromDecodedUrl(new Uri(clientContext.Url).AbsolutePath
+                                                                    + ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOFolder)
+                                                                    + "/"
+                                                                    + uploadDocumentRequest.DocumentName);
                 File file = clientContext.Web.GetFileByServerRelativePath(filePath);
                 clientContext.Load(file, i => i.Name,
                                          i => i.UniqueId,

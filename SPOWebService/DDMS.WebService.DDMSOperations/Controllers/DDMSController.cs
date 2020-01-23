@@ -15,7 +15,7 @@ using System.Web.Http;
 namespace DDMS.WebService.DDMSOperations.Controllers
 {
     [ExcludeFromCodeCoverage]
-    [Authorization]
+    [AuthorizedUser(Application = "DDMS")]
     [HeaderValidate]
     public class DDMSController : ApiController
     {
