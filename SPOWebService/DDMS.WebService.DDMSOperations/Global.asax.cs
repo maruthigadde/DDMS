@@ -18,6 +18,8 @@ namespace DDMS.WebService.DDMSOperations
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //initialize and configure log4net
+            log4net.Config.XmlConfigurator.Configure();
         }
     }
 }

@@ -19,11 +19,12 @@ namespace DDMSWebServiceTest
         private static string version = string.Empty;
         private static byte[] fileContent = null;
         private static string fileName = string.Empty;
+        private static string LoggerId = string.Empty;
 
         [TestMethod, Priority(1)]
         public void UploadDocument_FileNotFound_Exception()
         {
-
+            LoggerId = Fixture.Create<Guid>().ToString();
             var uploadDocumentRequest = Fixture.Create<UploadDocumentRequest>();
 
 
@@ -31,7 +32,7 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(uploadDocumentResponse2.ErrorMessage == ErrorMessage.FileNotFound);
         }
@@ -57,7 +58,7 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(uploadDocumentResponse2.ErrorMessage));
             documentId = uploadDocumentResponse2.DocumentId;
@@ -84,7 +85,7 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(uploadDocumentResponse2.ErrorMessage));
             documentId = uploadDocumentResponse2.DocumentId;
@@ -110,7 +111,7 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(uploadDocumentResponse2.ErrorMessage));
             documentId = uploadDocumentResponse2.DocumentId;
@@ -134,7 +135,7 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(uploadDocumentResponse2.ErrorMessage == ErrorMessage.DifferentFileExtension);
         }
@@ -159,28 +160,12 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(uploadDocumentResponse2.ErrorMessage == ErrorMessage.MaxFileSizeContentReached);
         }
 
         [TestMethod, Priority(7)]
-        public void UploadDocument_RemoteName_Exception()
-        {
-
-            var uploadDocumentRequest = Fixture.Create<UploadDocumentRequest>();
-
-
-            var uploadDocumentResponse = Fixture.Create<UploadDocumentResponse>();
-
-            var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
-
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
-
-            Assert.IsTrue(uploadDocumentResponse2.ErrorMessage == ErrorMessage.RemoteName);
-        }
-
-        [TestMethod, Priority(8)]
         public void UploadDocument_UpdateMetaData()
         {
             var uploadDocumentRequest = new UploadDocumentRequest();
@@ -196,14 +181,14 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(uploadDocumentResponse2.ErrorMessage));
             documentId = uploadDocumentResponse2.DocumentId;
             version = uploadDocumentResponse2.Version;
         }
 
-        [TestMethod, Priority(9)]
+        [TestMethod, Priority(8)]
         public void UploadDocument_UpdateMetaData_FileNotFound_Exception()
         {
             var uploadDocumentRequest = new UploadDocumentRequest();
@@ -219,12 +204,12 @@ namespace DDMSWebServiceTest
 
             var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+            var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
             Assert.IsTrue(uploadDocumentResponse2.ErrorMessage == ErrorMessage.FileNotFound);
         }
 
-        [TestMethod, Priority(10)]
+        [TestMethod, Priority(9)]
         public void UploadDocument_MaxRetryAttemps()
         {
             Parallel.For(0, 100, (i, loopState) =>
@@ -236,7 +221,7 @@ namespace DDMSWebServiceTest
 
                 var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
 
-                var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest);
+                var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
 
                 if (uploadDocumentResponse2.ErrorMessage == string.Format("Maximum retry attempts {0}, has be attempted.", ExecuteQueryConstants.RetryCount))
                 {
@@ -247,7 +232,7 @@ namespace DDMSWebServiceTest
             });
         }
 
-        [TestMethod, Priority(11)]
+        [TestMethod, Priority(10)]
         public void SearchDocument_FileNotFound_Exception()
         {
 
@@ -259,12 +244,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(searchDocumentRequest2.ErrorMessage == ErrorMessage.FileNotFound);
         }
 
-        [TestMethod, Priority(12)]
+        [TestMethod, Priority(11)]
         public void SearchDocument_AllOldVersions_FileNotFound_Exception()
         {
 
@@ -275,12 +260,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearchAllOldVersions(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearchAllOldVersions(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(searchDocumentRequest2.ErrorMessage == ErrorMessage.FileNotFound);
         }
 
-        [TestMethod, Priority(13)]
+        [TestMethod, Priority(12)]
         public void SearchDocument_AllOldVersions()
         {
 
@@ -291,12 +276,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearchAllOldVersions(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearchAllOldVersions(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(searchDocumentRequest2.ErrorMessage));
         }
 
-        [TestMethod, Priority(14)]
+        [TestMethod, Priority(13)]
         public void SearchDocument_Version()
         {
 
@@ -308,12 +293,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(searchDocumentRequest2.ErrorMessage));
         }
 
-        [TestMethod, Priority(15)]
+        [TestMethod, Priority(14)]
         public void SearchDocument_OldVersion_VersionDecimal()
         {
             var searchDocumentRequest = new SearchDocumentRequest();
@@ -324,12 +309,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(searchDocumentRequest2.ErrorMessage));
         }
 
-        [TestMethod, Priority(16)]
+        [TestMethod, Priority(15)]
         public void SearchDocument_OldVersion_VersionInt()
         {
             var searchDocumentRequest = new SearchDocumentRequest();
@@ -340,12 +325,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(searchDocumentRequest2.ErrorMessage));
         }
 
-        [TestMethod, Priority(17)]
+        [TestMethod, Priority(16)]
         public void SearchDocument_DocumentIdNull_Exception()
         {
 
@@ -356,29 +341,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(searchDocumentRequest2.ErrorMessage == string.Format(ErrorMessage.ValueEmpty, SpoConstants.DocumentId));
         }
 
-        [TestMethod, Priority(18)]
-        public void SearchDocument_RemoteName_Exception()
-        {
-
-            var searchDocumentRequest = new SearchDocumentRequest();
-            searchDocumentRequest.DocumentId = documentId;
-            searchDocumentRequest.Version = version;
-
-            var searchDocumentResponse = Fixture.Create<SearchDocumentResponse>();
-
-            var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
-
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
-
-            Assert.IsTrue(searchDocumentRequest2.ErrorMessage == ErrorMessage.RemoteName);
-        }
-
-        [TestMethod, Priority(19)]
+        [TestMethod, Priority(17)]
         public void SearchDocument_GreaterVersionProvided_Exception()
         {
 
@@ -390,12 +358,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(searchDocumentRequest2.ErrorMessage == ErrorMessage.GreaterVersionProvided);
         }
 
-        [TestMethod, Priority(20)]
+        [TestMethod, Priority(18)]
         public void SearchDocument_OldVersion_VersionString()
         {
 
@@ -407,12 +375,12 @@ namespace DDMSWebServiceTest
 
             var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
 
-            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest);
+            var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
             Assert.IsTrue(searchDocumentRequest2.ErrorMessage.Contains("Cannot invoke method or retrieve property from null object. Object returned by the following call stack is null."));
         }
 
-        [TestMethod, Priority(21)]
+        [TestMethod, Priority(19)]
         public void DeleteDocumentByVersion_FileNotFound_Exception()
         {
 
@@ -422,12 +390,12 @@ namespace DDMSWebServiceTest
 
             var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
 
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
+            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
 
             Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == ErrorMessage.FileNotFound);
         }
 
-        [TestMethod, Priority(22)]
+        [TestMethod, Priority(20)]
         public void DeleteDocumentAllVersion_FileNotFound_Exception()
         {
 
@@ -438,12 +406,12 @@ namespace DDMSWebServiceTest
 
             var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
 
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
+            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
 
             Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == ErrorMessage.FileNotFound);
         }
 
-        [TestMethod, Priority(23)]
+        [TestMethod, Priority(21)]
         public void DeleteDocument_CannotDeleteCurrentVersion_Exception()
         {
 
@@ -455,29 +423,12 @@ namespace DDMSWebServiceTest
 
             var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
 
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
+            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
 
             Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == "You cannot delete the current version.");
         }
 
-        [TestMethod, Priority(24)]
-        public void DeleteDocument_RemoteNameReslove_Exception()
-        {
-
-            var deleteDocumentRequest = new DeleteDocumentRequest();
-            deleteDocumentRequest.DocumentId = Fixture.Create<Guid>();
-            deleteDocumentRequest.Version = Fixture.Create<decimal>().ToString();
-
-            var deleteDocumentResponse = Fixture.Create<DeleteDocumentResponse>();
-
-            var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
-
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
-
-            Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == ErrorMessage.RemoteName);
-        }
-
-        [TestMethod, Priority(25)]
+        [TestMethod, Priority(22)]
         public void DeleteDocument_GreaterVersions_FileNotFound_Exception()
         {
 
@@ -489,12 +440,12 @@ namespace DDMSWebServiceTest
 
             var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
 
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
+            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
 
             Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == ErrorMessage.FileNotFound);
         }
 
-        [TestMethod, Priority(26)]
+        [TestMethod, Priority(23)]
         public void DeleteDocumentByVersions()
         {
 
@@ -506,12 +457,12 @@ namespace DDMSWebServiceTest
 
             var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
 
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
+            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(deleteDocumentResponse2.ErrorMessage));
         }
 
-        [TestMethod, Priority(27)]
+        [TestMethod, Priority(24)]
         public void DeleteDocumentAllVersions()
         {
 
@@ -522,12 +473,12 @@ namespace DDMSWebServiceTest
 
             var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
 
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
+            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
 
             Assert.IsTrue(string.IsNullOrEmpty(deleteDocumentResponse2.ErrorMessage));
         }
 
-        [TestMethod, Priority(28)]
+        [TestMethod, Priority(25)]
         public void DeleteDocument_DocumentIdNull_Exception()
         {
 
@@ -538,9 +489,58 @@ namespace DDMSWebServiceTest
 
             var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
 
-            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest);
+            var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
 
             Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == string.Format(ErrorMessage.ValueEmpty, SpoConstants.DocumentId));
         }
+
+        //[TestMethod, Priority(26)]
+        //public void UploadDocument_RemoteName_Exception()
+        //{
+
+        //    var uploadDocumentRequest = Fixture.Create<UploadDocumentRequest>();
+
+
+        //    var uploadDocumentResponse = Fixture.Create<UploadDocumentResponse>();
+
+        //    var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
+
+        //    var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
+
+        //    Assert.IsTrue(uploadDocumentResponse2.ErrorMessage == ErrorMessage.RemoteName);
+        //}
+
+        //[TestMethod, Priority(27)]
+        //public void SearchDocument_RemoteName_Exception()
+        //{
+
+        //    var searchDocumentRequest = new SearchDocumentRequest();
+        //    searchDocumentRequest.DocumentId = documentId;
+        //    searchDocumentRequest.Version = version;
+
+        //    var searchDocumentResponse = Fixture.Create<SearchDocumentResponse>();
+
+        //    var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
+
+        //    var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
+
+        //    Assert.IsTrue(searchDocumentRequest2.ErrorMessage == ErrorMessage.RemoteName);
+        //}
+
+        //[TestMethod, Priority(28)]
+        //public void DeleteDocument_RemoteName_Exception()
+        //{
+        //    var deleteDocumentRequest = new DeleteDocumentRequest();
+        //    deleteDocumentRequest.DocumentId = Fixture.Create<Guid>();
+        //    deleteDocumentRequest.Version = Fixture.Create<decimal>().ToString();
+
+        //    var deleteDocumentResponse = Fixture.Create<DeleteDocumentResponse>();
+
+        //    var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
+
+        //    var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
+
+        //    Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == ErrorMessage.RemoteName);
+        //}
     }
 }

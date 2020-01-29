@@ -5,9 +5,7 @@ namespace DDMS.WebService.Constants
     [ExcludeFromCodeCoverage]
     public static class ConfigurationConstants
     {
-        //public const string SPOSiteId = "SPOSiteId";
-        //public const string SPOSiteIdKey = "SPOSiteIdKey";
-        //public const string SPOSiteIdIv = "SPOSiteIdIv";
+      
         public const string SPOUserName = "SPOUserName";
         public const string SPOUserNameKey = "SPOUserNameKey";
         public const string SPOUserNameIv = "SPOUserNameIv";
@@ -17,27 +15,16 @@ namespace DDMS.WebService.Constants
 
         public const string SPOSiteURL = "SPOSiteURL";
         public const string SPOFolder = "SPOFolder";
+        public const string SPORelativeURL = "SPORelativeURL";
     }
 
-    [ExcludeFromCodeCoverage]
-    public static class LoggerConfigurationConstants
-    {
-        public const string LogDirectory = "LogDirectory";
-        public const string LogPath = "LogPath";
-        public const string LogLevel = "LogLevel";
-        public const string ConversionPattern = "%date [%thread] %-5level %logger - %message%newline";
-        public const string Info = "INFO";
-        public const string Debug = "DEBUG";
-        public const string Error = "ERROR";
-        public const string Off = "OFF";
-        public const string DateTimeFormat = "dd-MM-yyyy";
-        public const string FileExtension = ".txt";
-    }
+    
 
     [ExcludeFromCodeCoverage]
     public static class SpoConstants
     {
         public const string Title = "Title";
+        public const string Name = "FileLeafRef";
         public const string DealerNumber = "DealerNumber";
         public const string ClaimNumber = "ClaimNumber";
         public const string ClaimSubmDate = "ClaimSubmDate";
@@ -51,7 +38,7 @@ namespace DDMS.WebService.Constants
         public const string DocumentumId = "DocumentumId";
         public const string DocumentumVersion = "DocumentumVersion";
         public const bool OverRideExistingVersion = true;
-        public const int MaxFileSize = 31457280;
+        public const string MaxFileSize = "MaximumFileSizeAllowed";
         public const string DocumentId = "documentId";
     }
     [ExcludeFromCodeCoverage]
@@ -113,7 +100,7 @@ namespace DDMS.WebService.Constants
     {
         public const string DifferentFileExtension = "Cannot update a file with different extension,please upload the file with same extension";
         public const string UploadFailed = "Failed to upload file and metadata";
-        public const string UpDateFailed = "Failed to update file and metadata";
+        public const string UpdateFailed = "Failed to update file and metadata";
         public const string FileNotFound = "File does not exist";
         public const string RemoteName = "Remote name could not be resolved";
         public const string RequiredMandatoryFields = "Please send all required mandatory fields";

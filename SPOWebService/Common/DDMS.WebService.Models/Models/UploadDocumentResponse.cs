@@ -13,7 +13,7 @@ namespace DDMS.WebService.Models
         #region Private Fields
         private Guid _documentid;
         private string _version;
-        //private string _correlationid;
+       
         private string _errormessage;
         #endregion
 
@@ -40,17 +40,7 @@ namespace DDMS.WebService.Models
                 this._version = value;
             }
         }
-        //public string CorrelationId
-        //{
-        //    get
-        //    {
-        //        return this._correlationid;
-        //    }
-        //    set
-        //    {
-        //        this._correlationid = value;
-        //    }
-        //}
+        
         public string ErrorMessage
         {
             get

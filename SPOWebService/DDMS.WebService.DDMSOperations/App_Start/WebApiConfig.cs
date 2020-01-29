@@ -24,7 +24,7 @@ namespace DDMS.WebService.DDMSOperations
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-          //  config.Filters.Add(new RequireHttpsAttribute());
+        
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
             var container = new UnityContainer();

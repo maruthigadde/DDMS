@@ -33,7 +33,7 @@ namespace DDMS.WebService.Models
             }
         }
         [Required(AllowEmptyStrings = false, ErrorMessage = "DocumentName is Missing or DocumentName is invalid")]
-        [RegularExpression(@"^[a-zA-Z0-9_\~\!\@\#\$\%\^\&\(\)\-\`\+\=\{\[\}\]\;\'\ \,]{1,400}\.(doc|ppt|xls|docx|pptx|xlsx|pdf|zip|jpg|tif|gif|DOC|PPT|XLS|PDF|ZIP|JPG|TIF|GIF|DOCX|PPTX|XLSX)$", ErrorMessage = @"Document name should be of max 400 characters and special-characters like '/*\<|>?""' are not allowed")]
+        [RegularExpression(@"^[a-zA-Z0-9_\~\!\@\#\$\%\^\&\(\)\-\`\+\=\{\[\}\]\;\'\.\ \,]{1,400}\.(doc|ppt|xls|docx|pptx|xlsx|pdf|zip|jpg|tif|gif|DOC|PPT|XLS|PDF|ZIP|JPG|TIF|GIF|DOCX|PPTX|XLSX)$", ErrorMessage = @"Document name should be of max 400 characters and special-characters like '/*\<|>?""' are not allowed")]
         public string DocumentName
         {
             get
@@ -80,85 +80,7 @@ namespace DDMS.WebService.Models
             }
         }
 
-        #region Commented
-        //public string ClaimNumber
-        //{
-        //    get
-        //    {
-        //        return this._claimnumber;
-        //    }
-        //    set
-        //    {
-        //        this._claimnumber = value;
-        //    }
-        //}
-        //public string ClaimSubmDate
-        //{
-        //    get
-        //    {
-        //        return this._claimsubmdate;
-        //    }
-        //    set
-        //    {
-        //        this._claimsubmdate = value;
-        //    }
-        //}
-        //public string RepairOrderDate
-        //{
-        //    get
-        //    {
-        //        return this._repairorderdate;
-        //    }
-        //    set
-        //    {
-        //        this._repairorderdate = value;
-        //    }
-        //}
-        //public string RepairOrderNumber
-        //{
-        //    get
-        //    {
-        //        return this._repairordernumber;
-        //    }
-        //    set
-        //    {
-        //        this._repairordernumber = value;
-        //    }
-        //}
-        //public string VinNumber
-        //{
-        //    get
-        //    {
-        //        return this._vinnumber;
-        //    }
-        //    set
-        //    {
-        //        this._vinnumber = value;
-        //    }
-        //}
-        //public string ClaimId
-        //{
-        //    get
-        //    {
-        //        return this._claimid;
-        //    }
-        //    set
-        //    {
-        //        this._claimid = value;
-        //    }
-        //}
-        //public string DivisionId
-        //{
-        //    get
-        //    {
-        //        return this._divisionid;
-        //    }
-        //    set
-        //    {
-        //        this._divisionid = value;
-        //    }
-        //} 
-        #endregion
+       
 
         #endregion
     }
