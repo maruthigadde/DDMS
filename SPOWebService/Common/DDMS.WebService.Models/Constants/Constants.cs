@@ -5,7 +5,7 @@ namespace DDMS.WebService.Constants
     [ExcludeFromCodeCoverage]
     public static class ConfigurationConstants
     {
-      
+
         public const string SPOUserName = "SPOUserName";
         public const string SPOUserNameKey = "SPOUserNameKey";
         public const string SPOUserNameIv = "SPOUserNameIv";
@@ -18,7 +18,7 @@ namespace DDMS.WebService.Constants
         public const string SPORelativeURL = "SPORelativeURL";
     }
 
-    
+
 
     [ExcludeFromCodeCoverage]
     public static class SpoConstants
@@ -83,8 +83,8 @@ namespace DDMS.WebService.Constants
     [ExcludeFromCodeCoverage]
     public static class ExecuteQueryConstants
     {
-        public const int RetryCount = 3;
-        public const int RetryDelayTime = 30000;
+        public const string RetryCount = "RetryCount";
+        public const string RetryDelayTime = "RetryDelayTime";
     }
 
     [ExcludeFromCodeCoverage]
@@ -118,6 +118,8 @@ namespace DDMS.WebService.Constants
         public const string SystemIoFileNotFound = "System.IO.FileNotFoundException";
         public const string ArgumentException = "System.ArgumentException";
         public const string SpFieldValueException = "Microsoft.SharePoint.SPFieldValueException";
+        public const string ClientServiceException = "Microsoft.SharePoint.Client.ClientServiceException";
+        public const string CannotRetrieveNullObject = "Cannot invoke method or retrieve property from null object. Object returned by the following call stack is null";
     }
 
     [ExcludeFromCodeCoverage]

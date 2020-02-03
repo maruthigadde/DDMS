@@ -105,7 +105,9 @@ namespace DDMS.WebService.SPOActions
                                                  i => i.ServerRelativeUrl,
                                                  i => i.ListId,
                                                  i => i.Exists);
-                        clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                        clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                            Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                            LoggerId);
 
                         if (file.Exists)
                         {
@@ -189,16 +191,19 @@ namespace DDMS.WebService.SPOActions
                                              i => i.ServerRelativeUrl,
                                              i => i.ListId,
                                              i => i.Exists);
-                    clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                    clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                        Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                        LoggerId);
 
                     //Fetch the folder path of the file which exists in SPO library
                     Folder folder = clientContext.Web.GetFolderByServerRelativeUrl(ConfigurationManager.AppSettings.Get(ConfigurationConstants.SPOSiteURL)
                                                                                    + "/"
                                                                                    + System.IO.Path.GetDirectoryName(file.ServerRelativeUrl));
                     clientContext.Load(folder);
-                    clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                    clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                        Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                        LoggerId);
 
-                    
                     if (uploadDocumentRequest.DocumentContent != null && uploadDocumentRequest.DocumentContent.Length > 0 && uploadDocumentRequest.DocumentContent.Length <= Convert.ToInt32(ConfigurationManager.AppSettings.Get(SpoConstants.MaxFileSize)))
                     {
                         //Check if the file extension in request is same as the file in SPO library
@@ -226,7 +231,9 @@ namespace DDMS.WebService.SPOActions
                                                      i => i.ListId,
                                                      i => i.Exists);
                             //Update an existing document
-                            clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                            clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                                Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                                LoggerId);
                             uploadDocumentResponse.DocumentId = file.UniqueId;
                             uploadDocumentResponse.Version = file.UIVersionLabel;
                             Log.DebugFormat("In UpdateDocument method after updating the document in SPO for MessageId - {0} DocumentId :{1} Version{2}", LoggerId, uploadDocumentResponse.DocumentId, uploadDocumentResponse.Version);
@@ -327,7 +334,9 @@ namespace DDMS.WebService.SPOActions
                                          i => i.ServerRelativeUrl,
                                          i => i.ListId,
                                          i => i.Exists);
-                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                    Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                    LoggerId);
                 if (file.Exists)
                     //If file exists in SPO, return true
                     fileAlreadyExistStatus = true;
@@ -391,7 +400,9 @@ namespace DDMS.WebService.SPOActions
                                          i => i.ServerRelativeUrl,
                                          i => i.ListId,
                                          i => i.Exists);
-                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                    Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                    LoggerId);
                 //Retrieve the unique document id after upload
                 uploadDocumentResponse.DocumentId = file.UniqueId;
                 //Retrieve the version number

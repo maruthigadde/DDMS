@@ -377,7 +377,7 @@ namespace DDMSWebServiceTest
 
             var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
 
-            Assert.IsTrue(searchDocumentRequest2.ErrorMessage.Contains("Cannot invoke method or retrieve property from null object. Object returned by the following call stack is null."));
+            Assert.IsTrue(searchDocumentRequest2.ErrorMessage == ErrorMessage.FileNotFound);
         }
 
         [TestMethod, Priority(19)]
@@ -493,54 +493,5 @@ namespace DDMSWebServiceTest
 
             Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == string.Format(ErrorMessage.ValueEmpty, SpoConstants.DocumentId));
         }
-
-        //[TestMethod, Priority(26)]
-        //public void UploadDocument_RemoteName_Exception()
-        //{
-
-        //    var uploadDocumentRequest = Fixture.Create<UploadDocumentRequest>();
-
-
-        //    var uploadDocumentResponse = Fixture.Create<UploadDocumentResponse>();
-
-        //    var ddmsUploadDocument = Substitute.For<DDMSUploadDocument>();
-
-        //    var uploadDocumentResponse2 = ddmsUploadDocument.DDMSUpload(uploadDocumentRequest, LoggerId);
-
-        //    Assert.IsTrue(uploadDocumentResponse2.ErrorMessage == ErrorMessage.RemoteName);
-        //}
-
-        //[TestMethod, Priority(27)]
-        //public void SearchDocument_RemoteName_Exception()
-        //{
-
-        //    var searchDocumentRequest = new SearchDocumentRequest();
-        //    searchDocumentRequest.DocumentId = documentId;
-        //    searchDocumentRequest.Version = version;
-
-        //    var searchDocumentResponse = Fixture.Create<SearchDocumentResponse>();
-
-        //    var ddmsSearchDocument = Substitute.For<DDMSSearchDocument>();
-
-        //    var searchDocumentRequest2 = ddmsSearchDocument.DDMSSearch(searchDocumentRequest, LoggerId);
-
-        //    Assert.IsTrue(searchDocumentRequest2.ErrorMessage == ErrorMessage.RemoteName);
-        //}
-
-        //[TestMethod, Priority(28)]
-        //public void DeleteDocument_RemoteName_Exception()
-        //{
-        //    var deleteDocumentRequest = new DeleteDocumentRequest();
-        //    deleteDocumentRequest.DocumentId = Fixture.Create<Guid>();
-        //    deleteDocumentRequest.Version = Fixture.Create<decimal>().ToString();
-
-        //    var deleteDocumentResponse = Fixture.Create<DeleteDocumentResponse>();
-
-        //    var ddmsDeleteDocument = Substitute.For<DDMSDeleteDocument>();
-
-        //    var deleteDocumentResponse2 = ddmsDeleteDocument.DDMSDelete(deleteDocumentRequest, LoggerId);
-
-        //    Assert.IsTrue(deleteDocumentResponse2.ErrorMessage == ErrorMessage.RemoteName);
-        //}
     }
 }

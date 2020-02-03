@@ -111,7 +111,9 @@ namespace DDMS.WebService.SPOActions
                                              item => item[SpoConstants.RequestUser],
                                              item => item[SpoConstants.Version]);
                     clientContext.Load(versions);
-                    clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                    clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                        Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                        LoggerId);
                     Log.DebugFormat("In DDMSSearchAllOldVersions method after ExecuteQueryWithRetry for MessageId - {0}", LoggerId);
                     //loop through all versions and fetch metadata
                     foreach (var version in versions)
@@ -233,8 +235,9 @@ namespace DDMS.WebService.SPOActions
                                                      item => item[SpoConstants.RequestUser],
                                                      item => item[SpoConstants.Version]);
                 clientContext.Load(fileVersions);
-                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount,
-                                                    ExecuteQueryConstants.RetryDelayTime);
+                clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                    Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                    LoggerId);
                 Log.DebugFormat("In SearchDocumentByVersion method after ExecuteQueryWithRetry method for MessageId - {0}", LoggerId);
                 using (MemoryStream mStream = new MemoryStream())
                 {
@@ -268,6 +271,8 @@ namespace DDMS.WebService.SPOActions
             {
                 Log.ErrorFormat("ServerException in SearchDocumentByVersion method for MessageId - {0} :{1}", LoggerId, ex.Message);
                 if (ex.ServerErrorTypeName == ErrorException.SystemIoFileNotFound)
+                    searchDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
+                if (ex.ServerErrorTypeName == ErrorException.ClientServiceException && ex.Message.Contains(ErrorException.CannotRetrieveNullObject))
                     searchDocumentResponse.ErrorMessage = ErrorMessage.FileNotFound;
                 else
                     searchDocumentResponse.ErrorMessage = ex.Message;
@@ -304,7 +309,9 @@ namespace DDMS.WebService.SPOActions
                                              item => item[SpoConstants.RequestUser],
                                              item => item[SpoConstants.Version]);
                 ClientResult<Stream> clientResult = file.OpenBinaryStream();
-                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                    Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                    LoggerId);
                 Log.DebugFormat("In SearchDocumentCurrentVersion after ExecuteQueryWithRetry method for MessageId - {0}", LoggerId);
                 using (MemoryStream mStream = new MemoryStream())
                 {

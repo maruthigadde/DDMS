@@ -95,10 +95,12 @@ namespace DDMS.WebService.SPOActions
                 //Retrieve the file based on DocumentId
                 File file = clientContext.Web.GetFileById(deleteDocumentRequest.DocumentId);
                 clientContext.Load(file);
-                
+
                 //Recycle the file - returns the GUID of the file in Recycle Bin
                 ClientResult<Guid> recycle = file.Recycle();
-                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                    Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                    LoggerId);
                 Log.DebugFormat("In DeleteAllversions after ExecuteQueryWithRetry for MessageId - {0} - Document Deleted RecycleId : {1}", LoggerId, recycle.Value.ToString());
             }
             catch (Exception e)
@@ -128,7 +130,9 @@ namespace DDMS.WebService.SPOActions
                 clientContext.Load(fileVersions);
                 //Recycle file based on version label
                 fileVersions.RecycleByLabel(deleteDocumentRequest.Version);
-                clientContext.ExecuteQueryWithRetry(ExecuteQueryConstants.RetryCount, ExecuteQueryConstants.RetryDelayTime);
+                clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
+                                                    Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
+                                                    LoggerId);
                 Log.DebugFormat("In DeleteByVersion after ExecuteQueryWithRetry for MessageId - {0} - Document Deleted for Version {1}", LoggerId, deleteDocumentRequest.Version);
             }
             catch (Exception e)
