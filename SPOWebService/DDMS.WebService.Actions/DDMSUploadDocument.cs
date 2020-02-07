@@ -328,12 +328,7 @@ namespace DDMS.WebService.SPOActions
                                                                     + "/"
                                                                     + uploadDocumentRequest.DocumentName);
                 File file = clientContext.Web.GetFileByServerRelativePath(filePath);
-                clientContext.Load(file, i => i.Name,
-                                         i => i.UniqueId,
-                                         i => i.UIVersionLabel,
-                                         i => i.ServerRelativeUrl,
-                                         i => i.ListId,
-                                         i => i.Exists);
+                clientContext.Load(file, i => i.Exists);
                 clientContext.ExecuteQueryWithRetry(Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryCount)),
                                                     Convert.ToInt32(ConfigurationManager.AppSettings.Get(ExecuteQueryConstants.RetryDelayTime)),
                                                     LoggerId);
