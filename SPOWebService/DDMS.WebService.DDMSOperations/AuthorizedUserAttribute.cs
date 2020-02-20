@@ -15,6 +15,7 @@ namespace DDMS.WebService.DDMSOperations
     {
         private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private string SecurityGroup = "";
+        private int AuthenticationCacheTime = 0;
         private static MemoryCache memoryCache = MemoryCache.Default;
         public string Application { get; set; }
         protected override bool IsAuthorized(HttpActionContext httpContext)
@@ -22,6 +23,7 @@ namespace DDMS.WebService.DDMSOperations
             Log.Info("Authorization Application :" + Application);
             SecurityGroup = ConfigurationManager.AppSettings.Get(Application + "SecurityGroup");
             Log.Info("Authorization SecurityGroup :" + SecurityGroup);
+            AuthenticationCacheTime = Convert.ToInt32(ConfigurationManager.AppSettings.Get("AuthenticationCacheTime"));
             if (String.IsNullOrEmpty(SecurityGroup))
             {
                 return false;
@@ -44,7 +46,7 @@ namespace DDMS.WebService.DDMSOperations
                 if (userPrincipal.IsMemberOf(context, IdentityType.Name, SecurityGroup.Split('\\')[1]))
                 {
                     //caching the user deatils
-                    Add(HttpContext.Current.User.Identity.Name, true, DateTimeOffset.UtcNow.AddMinutes(5));
+                    Add(HttpContext.Current.User.Identity.Name, true, DateTimeOffset.UtcNow.AddMinutes(AuthenticationCacheTime));
                     Log.Info("User is a member of AD Group");
                     return true;
                 }
